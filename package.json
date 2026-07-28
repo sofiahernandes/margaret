@@ -1,0 +1,10 @@
+{
+  "name": "margaret",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Senior-engineer productivity toolkit for AI Agents — lean-code persona, over-engineering scans, security review, Figma design/code bridge.",
+  "scripts": {
+    "test": "node --test tests/*.test.js && node scripts/check-structure.js && node scripts/check-rule-copies.js"
+  }
+}
