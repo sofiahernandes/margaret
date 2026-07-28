@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "node \"${PLUGIN_ROOT}/hooks/margaret-activate.js\"",
+        "powershell": "node \"${PLUGIN_ROOT}\\hooks\\margaret-activate.js\"",
+        "timeoutSec": 5
+      }
+    ],
+    "userPromptSubmitted": [
+      {
+        "type": "command",
+        "bash": "node \"${PLUGIN_ROOT}/hooks/margaret-mode-tracker.js\"",
+        "powershell": "node \"${PLUGIN_ROOT}\\hooks\\margaret-mode-tracker.js\"",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}

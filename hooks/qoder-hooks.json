@@ -1,0 +1,26 @@
+{
+  "_comment": "Reference template — copy the 'hooks' object into your .qoder/settings.json or ~/.qoder/settings.json. Replace MARGARET_DIR with the path to your margaret checkout (e.g. ~/.qoder/plugins/margaret).",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node MARGARET_DIR/hooks/margaret-mode-tracker.js"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "task|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node MARGARET_DIR/hooks/margaret-subagent.js"
+          }
+        ]
+      }
+    ]
+  }
+}
