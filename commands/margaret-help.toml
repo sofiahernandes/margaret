@@ -1,0 +1,2 @@
+description = "List all margaret commands, modes, and flags"
+prompt = "Display the margaret quick-reference card, as defined in the margaret-help skill: every command, its args, its default, and a one-line purpose. One-shot display, do not change any mode or persist anything."
