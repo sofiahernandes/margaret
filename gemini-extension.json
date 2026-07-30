@@ -1,0 +1,7 @@
+{
+  "name": "margaret",
+  "version": "1.0.0",
+  "description": "Senior-engineer productivity toolkit: lean-code enforcement, over-engineering scans, security review, Figma design/code bridge.",
+  "license": "MIT",
+  "contextFileName": "AGENTS.md"
+}

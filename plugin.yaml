@@ -1,0 +1,21 @@
+name: margaret
+version: 1.0.0
+license: MIT
+description: Senior-engineer productivity toolkit for AI Agents — lean-code persona, over-engineering scans, security review, Figma design/code bridge.
+provides_hooks:
+  - SessionStart
+  - SubagentStart
+  - UserPromptSubmit
+provides_commands:
+  - margaret
+  - margaret-scan
+  - margaret-review
+  - margaret-guard
+  - margaret-design
+  - margaret-help
+provides_skills:
+  - margaret
+  - margaret-scan
+  - margaret-guard
+  - margaret-design
+  - margaret-help

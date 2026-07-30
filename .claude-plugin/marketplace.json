@@ -1,0 +1,15 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "margaret",
+  "description": "Named for Margaret Hamilton. A propulsion toolkit for developers: write leaner code, catch over-engineering, catch security bugs, bridge Figma and code.",
+  "plugins": [
+    {
+      "name": "margaret",
+      "version": "1.0.0",
+      "description": "Lean-code persona, over-engineering scans, security review, Figma sync/craft.",
+      "source": "./",
+      "category": "productivity",
+      "license": "MIT"
+    }
+  ]
+}
