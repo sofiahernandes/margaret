@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Benchmark secrets
+.env
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OS cruft
+.DS_Store
