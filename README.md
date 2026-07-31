@@ -3,7 +3,7 @@
 <img height="240" alt="margaret" src="https://github.com/user-attachments/assets/c67cb73c-0ef5-4ec7-82e7-439702203c3a" />
 <p>
   Design the architecture first. Implement the smallest solution that satisfies it.<br/>
-  Access the full documentation: <a href="">https://margaret.mintlify.site</a>
+  Access the full documentation: <a href="https://margaret.mintlify.site">https://margaret.mintlify.site</a>
 </p>
 </div>
 
