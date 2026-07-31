@@ -1,26 +1,19 @@
 {
   "name": "margaret",
   "version": "1.0.0",
-  "description": "All-in-one engineer personality for developers: lean-code enforcement, over-engineering scans, security review, Figma design/code bridge.",
+  "description": "Senior-engineer productivity toolkit: lean-code enforcement, over-engineering scans, security review, Figma design/code bridge.",
   "license": "MIT",
-  "keywords": [
-    "yagni",
-    "minimalism",
-    "code-review",
-    "security-review",
-    "figma",
-    "productivity"
-  ],
+  "keywords": ["yagni", "minimalism", "code-review", "security-review", "figma", "productivity"],
   "skills": "./skills/",
   "hooks": "./hooks/claude-hooks.json",
   "interface": {
     "displayName": "Margaret",
-    "shortDescription": "All-in-one engineer mode",
-    "longDescription": "The developer's last stop after every other fix has failed. Prefer YAGNI, the standard library, native platform features, and the smallest correct implementation. Also ships over-engineering scans, security review, and a Figma design/code bridge.",
+    "shortDescription": "Lean-code senior-dev mode",
+    "longDescription": "Prefer YAGNI, the standard library, native platform features, and the smallest correct implementation. Also ships over-engineering scans, security review, and a Figma design/code bridge.",
     "category": "Productivity",
     "capabilities": ["Instructions", "Lifecycle hooks"],
     "defaultPrompt": [
-      "Use margaret as the all-in-one engineer for this task.",
+      "Use margaret mode for this task.",
       "Review this diff for over-engineering.",
       "Find the smallest correct implementation."
     ]

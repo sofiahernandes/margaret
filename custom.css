@@ -1,0 +1,142 @@
+h1 {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+nav h2 {
+  padding-top: 2.8em;
+}
+
+ul {
+  padding-top: 0.6em;
+}
+
+a {
+  padding-top: 0.2em;
+  padding-bottom: 0em;
+  font-size: 15px;
+}
+
+li a {
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  border-radius: 8px;
+}
+
+#search-bar-entry {
+  border-radius: 8px;
+}
+
+#theme-preference-menu-trigger {
+  padding-bottom: 0em;
+}
+
+#theme-preference-menu-content {
+  border-radius: 8px;
+}
+
+#theme-preference-menu-item-dark,
+#theme-preference-menu-item-light,
+#theme-preference-menu-item-system {
+  padding: 0.4em;
+  border-radius: 8px;
+}
+
+#footer {
+  padding-bottom: 2.8em;
+}
+
+#footer * {
+  font-size: 12px;
+}
+
+#navbar a[href$="margaret.mintlify.site"],
+nav a[href$="margaret.mintlify.site"] {
+  display: flex;
+  align-items: center;
+}
+
+#navbar a[href$="margaret.mintlify.site"]::after,
+nav a[href$="margaret.mintlify.site"]::after {
+  content: "margaret";
+  margin-left: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.8;
+  font-size: 1.6rem;
+}
+
+.sidebar-group-header {
+  margin-bottom: 0em;
+  padding-left: 0em;
+  font-size: 15px;
+}
+
+.eyebrow {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.prose,
+article {
+  line-height: 1.4;
+  font-size: 15px;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  margin-top: 1.1em;
+  margin-bottom: 1.1em;
+  font-size: 15px;
+}
+
+.prose h1 {
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-bottom: 0.6em;
+}
+
+.prose h2 {
+  font-size: 1.4rem;
+  line-height: 1;
+  margin-top: 2em;
+  margin-bottom: 0.6em;
+}
+
+.prose h3 {
+  font-size: 1.1rem;
+  line-height: 1;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+}
+
+.prose table th,
+.prose table td {
+  font-size: 15px;
+  line-height: 1.4;
+  padding: 0.65rem 1rem;
+}
+
+.prose pre {
+  line-height: 1.4;
+  padding: 1rem 1.25rem;
+  font-size: 15px;
+}
+
+.prose code {
+  font-size: 15px;
+}
+
+@media (min-width: 1024px) {
+  .peer-\[\.is-not-custom\]\:px-4,
+  .px-4 {
+    padding-left: 0.8rem !important;
+    padding-right: 0.8rem !important;
+  }
+  #sidebar {
+    width: 14rem;
+  }
+  [data-component-part="scroll-area-viewport"] {
+    padding: 0 !important;
+  }
+}

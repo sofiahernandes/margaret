@@ -1,7 +1,7 @@
 name: margaret
 version: 1.0.0
 license: MIT
-description: All-in-one engineer productivity toolkit for AI Agents — the developer's last stop after every other fix has failed, plus lean-code enforcement, over-engineering scans, security review, Figma design/code bridge.
+description: Senior-engineer productivity toolkit for AI Agents — lean-code persona, over-engineering scans, security review, Figma design/code bridge.
 provides_hooks:
   - SessionStart
   - SubagentStart

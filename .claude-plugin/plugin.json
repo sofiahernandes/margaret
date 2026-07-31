@@ -1,7 +1,7 @@
 {
   "name": "margaret",
   "version": "1.0.0",
-  "description": "All-in-one engineer personality for developers: lean-code enforcement, over-engineering scans, security review, and a Figma design/code bridge.",
+  "description": "Senior-engineer productivity toolkit: lean-code enforcement, over-engineering scans, security review, and a Figma design/code bridge.",
   "license": "MIT",
   "hooks": "./hooks/claude-hooks.json"
 }

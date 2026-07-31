@@ -1,42 +1,48 @@
+<div align="center">
 <h1>Margaret Plugin</h1>
+<img height="240" alt="margaret" src="https://github.com/user-attachments/assets/c67cb73c-0ef5-4ec7-82e7-439702203c3a" />
 <p>
-  The all-in-one engineer developers go to after every other solution wasn't the perfect one.
-  Designs the architecture first. Implements the smallest solution that satisfies it.
+  Design the architecture first. Implement the smallest solution that satisfies it.<br/>
+  Access the full documentation: <a href="">https://margaret.mintlify.site</a>
 </p>
+</div>
+
+### Why "Margaret"
+
+> Named for [Margaret Hamilton](https://science-nasa-gov.translate.goog/people/margaret-hamilton/?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc), the lead software engineer for the Apollo Program's onboard flight software. Her team's code had to run on hardware with almost no memory or cycles to spare, survive real-time failure during a moon landing, and be provably correct because there was no patching it in flight. That's the standard this plugin borrows: engineered and reliable, no more than the mission needs.
+
 <br/>
 
-## Why "Margaret"?
+### What it is
 
-Named for [Margaret Hamilton](https://science-nasa-gov.translate.goog/people/margaret-hamilton/?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc), the lead software engineer for the Apollo Program's onboard flight software. Her team's code had to run on hardware with almost no memory or cycles to spare, survive real-time failure during a moon landing, and be provably correct because there was no patching it in flight. That's the standard this plugin borrows: straightforward and reliable, no more than the mission needs.
-
-## What it is
-
-Margaret is the developer's all-in-one engineering plugin: the one you reach for after you've already tried everything else and still didn't find the best solution or the best way to present it. It bundles four features engineers actually want during a session:
+Margaret is a plugin for developers. It bundles four things senior engineers actually want during a session:
 
 1. An **architect** that designs before it codes and defaults to the smallest correct implementation.
-2. An **over-engineering scanner** that inspects the current diff or the whole repository.
+2. An **over-engineering scanner** that inspects the current diff or the whole repo.
 3. A **security reviewer** that flags only high-confidence, exploitable findings in a diff.
-4. A **designer** that helps those who's natural habitat is the terminal to represent ideas visually, create diagrams, or pull design into a starting point for code.
+4. A **Figma bridge** that can pull design into a starting point for code, or generate new designs or diagrams for engineers to express themselves visually.
 
-## How it works
+<br/>
+
+### How it works
 
 Before writing code, the agent runs the candidate through a set of filters and builds at the first one that clears:
 
 ```
-1. Is there even a requirement here?                        → No? Skip it (YAGNI)
-2. Does this repo already solve it?                         → Reuse it, don't rewrite
-3. Standard library solves it?                              → Use it
-4. Platform feature solves it?                              → Use it
-5. Existing dependency solves it?                           → Use it
-6. One line solves it?                                      → Write the line
+1. Is there even a requirement here?    → no: skip it (YAGNI)
+2. Does this repo already solve it?     → reuse it, don't rewrite
+3. Stdlib solves it?                    → use it
+4. Platform feature solves it?          → use it
+5. Existing dependency solves it?       → use it
+6. One line solves it?                  → write the line
 7. Otherwise: least code that satisfies the requirement
 ```
 
-These filters only work once the problem is understood — the agent reads the code the change touches and traces the real flow before picking one.
+These filters only work once the problem is understood — the agent reads the code the change touches and traces the real flow before picking one. Never trimmed away: input validation at trust boundaries, error handling that prevents data loss, security, accessibility, anything explicitly requested. A shortcut that cuts a real corner gets a `margaret:` comment naming the ceiling and the upgrade path; non-trivial logic leaves one runnable check behind.
 
-Never trimmed away: input validation at trust boundaries, error handling that prevents data loss, security, accessibility, anything explicitly requested. A shortcut that cuts a real corner gets a `margaret:` comment naming the ceiling and the upgrade path; non-trivial logic leaves one runnable check behind.
+<br/>
 
-## Commands
+### Commands
 
 | Command            | Args (default)                                             | What it does                                                                                   |
 | ------------------ | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -50,37 +56,37 @@ Set the level for every new session with `MARGARET_DEFAULT_MODE` (`lean`/`full`/
 
 <br/>
 
-## Install
+### Install
 
-Node.js needs to be on your PATH for the hook-based hosts below. If it isn't, the skills still work, the always-on activation just stays quiet instead of erroring on every prompt.
+Node.js needs to be on your PATH for the hook-based hosts below — if it isn't, the skills still work, the always-on activation just stays quiet instead of erroring on every prompt.
 
-### Claude Code
+#### Claude Code
 
-```bash
+Two separate prompts.
+
+```
 /plugin marketplace add <this-repo>
 /plugin install margaret@margaret
 ```
 
-(Two separate prompts.)
+#### Codex
 
-### Codex
-
-```bash
+```
 codex plugin marketplace add <this-repo>
 codex plugin add margaret@margaret
 ```
 
 Run `codex` and open `/hooks` to review and trust the two lifecycle hooks (reused from Claude Code's `hooks/claude-hooks.json`).
 
-### Gemini CLI
-
-```bash
-gemini extensions install <this-repo-url>
-```
+#### Gemini CLI
 
 Gemini has no hook system, so it loads `AGENTS.md` as always-on context instead of switching modes — the screen always applies.
 
-### Cursor / Windsurf / Cline
+```
+gemini extensions install <this-repo-url>
+```
+
+#### Cursor / Windsurf / Cline
 
 None of these three run hooks either. Copy the matching rules file into your project:
 
@@ -88,30 +94,33 @@ None of these three run hooks either. Copy the matching rules file into your pro
 - Windsurf: [`.windsurf/rules/margaret.md`](.windsurf/rules/margaret.md)
 - Cline: [`.clinerules/margaret.md`](.clinerules/margaret.md)
 
-### GitHub Copilot / Qoder
+#### GitHub Copilot / Qoder
 
 Reference-only, not a packaged install: [`hooks/copilot-hooks.json`](hooks/copilot-hooks.json) and [`hooks/qoder-hooks.json`](hooks/qoder-hooks.json) document the hook shape those tools expect. Wire them into that tool's own settings by hand.
 
-## Uninstall
+<br/>
+
+### Uninstall
 
 Removing the plugin (marketplace remove / delete the checkout) doesn't touch state margaret wrote elsewhere: the mode flag, `~/.config/margaret/config.json`, and (if you wired it up) a `statusLine` entry in `~/.claude/settings.json`. **Run this before removing the plugin** — the script is itself a plugin file:
+It only removes the statusLine segment it owns, so a statusline you combined with another plugin's is left otherwise intact.
 
-```bash
+```
 node scripts/uninstall.js
 ```
 
-It only removes the statusLine segment it owns, so a statusline you combined with another plugin's is left otherwise intact.
+<br/>
 
-## Development
-
-```bash
-npm test
-```
+### Development
 
 Runs the unit tests, checks that every declared command/skill in `plugin.yaml` is backed by a real file, and checks that the persona's static copies (`AGENTS.md`, `.cursor/`, `.windsurf/`, `.clinerules/`) haven't drifted from each other.
 
+```
+npm test
+```
+
 <br/>
 
-## License
+### License
 
 <a href="https://github.com/sofiahernandes/margaret">Margaret</a> © 2026 by <a href="https://github.com/sofiahernandes">Sofia Botechia Hernandes</a> is licensed under [MIT](LICENSE).

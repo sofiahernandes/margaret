@@ -35,15 +35,21 @@ Tags:
 ## Examples
 
 ❌ "This `SlugGenerator` class seems like it might be handling more cases than strictly necessary — worth double-checking whether every branch is needed?"
+
 ✅ `L18-45: builtin: 30-line slug class reimplementing string normalization. str.lower().replace(' ', '-') plus a regex strip, 2 lines.`
+
 ✅ `L7: platform: left-pad package pulled in for one call. "x".padStart(5, "0"), 0 deps.`
+
 ✅ `store.py:L61: overbuilt: PaymentGatewayInterface with one implementer (Stripe). Inline the Stripe class until a second gateway is real.`
+
 ✅ `L40-58: cut: exponential backoff wrapper around a call that's already idempotent and fast. Nothing replaces it.`
+
 ✅ `L22-33: condense: hand-written merge of two dicts field by field. {**a, **b}, 1 line.`
 
 ## Closing line
 
 End every scan with the number that matters: `net: -<N> lines possible.` (repo scope also reports `-<M> deps possible.`)
+
 Nothing to cut? Say `Already lean. Ship it.` and stop there.
 
 ## Out of scope

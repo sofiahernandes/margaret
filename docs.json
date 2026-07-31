@@ -1,0 +1,40 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "margaret",
+  "favicon": "../docs/favicon.png",
+  "logo": {
+    "light": "../docs/favicon.png",
+    "dark": "../docs/favicon.png",
+    "href": "https://margaret.mintlify.site"
+  },
+  "colors": {
+    "primary": "#000",
+    "light": "#fff",
+    "dark": "#000"
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": ["docs/index", "docs/quickstart"]
+      },
+      {
+        "group": "Reference",
+        "pages": ["docs/commands", "docs/configuration", "docs/examples"]
+      },
+      {
+        "group": "Contributing",
+        "pages": ["docs/development"]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/sofiahernandes/margaret"
+      }
+    ]
+  }
+}
