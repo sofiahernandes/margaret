@@ -22,10 +22,10 @@ Tasks: email validator, JS debounce, CSV sum, React countdown, FastAPI rate-limi
 
 ## Metrics
 
-| File | Metric | Behavior |
-|------|--------|----------|
-| `loc.js` | `code_loc` | Measurement - always passes, records line count |
-| `correctness.js` | `correct` | Gate - fails if generated code doesn't work |
+| File             | Metric     | Behavior                                        |
+| ---------------- | ---------- | ----------------------------------------------- |
+| `loc.js`         | `code_loc` | Measurement - always passes, records line count |
+| `correctness.js` | `correct`  | Gate - fails if generated code doesn't work     |
 
 `correctness.js` extracts fenced code blocks and runs per-task checks (spawns Python/Node for email, debounce, CSV; structural regex for React and FastAPI). A broken one-liner that scores great on LOC will fail on correctness.
 
