@@ -1,0 +1,47 @@
+---
+title: Overview
+description: What margaret is and why it exists
+---
+
+# Margaret
+
+Senior-engineer productivity toolkit for AI coding agents: a lean-code persona, an over-engineering scanner, a security reviewer, and a Figma design/code bridge.
+
+### Why "Margaret"
+
+Named for [Margaret Hamilton](https://science-nasa-gov.translate.goog/people/margaret-hamilton/?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc), the lead software engineer for the Apollo Program's onboard flight software. Her team's code had to run on hardware with almost no memory or cycles to spare, survive real-time failure during a moon landing, and be provably correct because there was no patching it in flight. That's the standard this plugin borrows: engineered and reliable, no more than the mission needs.
+
+### What it bundles
+
+1. **Architect** (`/margaret`): designs before it codes and defaults to the smallest correct implementation.
+2. **Over-engineering scanner** (`/margaret-scan`): inspects the current diff or the whole repo.
+3. **Security reviewer** (`/margaret-guard`): flags only high-confidence, exploitable findings in a diff.
+4. **Figma bridge** (`/margaret-design`): can pull design into a starting point for code, or generate new designs or diagrams for engineers to express themselves visually.
+
+### How it decides what to build
+
+Before writing code, the agent runs the candidate through a set of filters and builds at the first one that clears:
+
+```
+1. Is there even a requirement here?    → no: skip it (YAGNI)
+2. Does this repo already solve it?     → reuse it, don't rewrite
+3. Stdlib solves it?                    → use it
+4. Platform feature solves it?          → use it
+5. Existing dependency solves it?       → use it
+6. One line solves it?                  → write the line
+7. Otherwise: least code that satisfies the requirement
+```
+
+These filters only apply once the problem is understood — the agent reads the code the change touches and traces the real flow before picking one. Never trimmed away: input validation at trust boundaries, error handling that prevents data loss, security, accessibility, anything explicitly requested. A shortcut that cuts a real corner gets a `margaret:` comment naming the ceiling and the upgrade path; non-trivial logic leaves one runnable check behind.
+
+### Supported hosts
+
+| Host | Support |
+| --- | --- |
+| Claude Code | Full commands, skills, hooks (`.claude-plugin/`) |
+| Codex | Full, shares `hooks/claude-hooks.json` (`.codex-plugin/`) |
+| Gemini CLI | Context-file only via `AGENTS.md` — screen always applies, no mode switching |
+| Cursor / Windsurf / Cline | Context-file only — copy the matching rules file into your project |
+| GitHub Copilot / Qoder | Reference hook manifests only, wire in by hand |
+
+See [Quickstart](/docs/quickstart) to install, [Commands & Skills](/docs/commands) for the full reference, [Configuration](/docs/configuration) for modes and defaults, and [Examples](/docs/examples) for sample sessions.

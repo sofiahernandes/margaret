@@ -1,0 +1,60 @@
+---
+title: Examples
+description: Sample sessions for each margaret command
+---
+
+## Building with the persona
+
+**Prompt**: "Add a cache for these API responses."
+
+**full (default) response**:
+> `@lru_cache(maxsize=1000)` wraps the fetch call. Skipped a bespoke cache class, add one once `lru_cache` demonstrably can't keep up.
+
+## Scanning a diff for bloat
+
+**Prompt**: `/margaret-scan`
+
+**Response** (one line per finding):
+```
+L18-45: builtin: 30-line slug class reimplementing string normalization. str.lower().replace(' ', '-') plus a regex strip, 2 lines.
+L7: platform: left-pad package pulled in for one call. "x".padStart(5, "0"), 0 deps.
+store.py:L61: overbuilt: PaymentGatewayInterface with one implementer (Stripe). Inline the Stripe class until a second gateway is real.
+net: -41 lines possible.
+```
+
+**Prompt**: `/margaret-scan repo` — same format, scoped to the whole tree, biggest win first, and reports removable deps too:
+```
+net: -230 lines possible. -3 deps possible.
+```
+
+## Auditing security
+
+**Prompt**: `/margaret-guard`
+
+**Response**:
+```
+# Vuln 1: XSS: `foo.py:42`
+
+* Severity: High
+* Description: user input from `username` is interpolated into HTML unescaped
+* Exploit Scenario: attacker crafts a URL with `<script>` payload that runs in the victim's browser
+* Recommendation: escape via the templating engine's auto-escaping
+```
+
+If nothing clears the >80%-confidence bar, the reply is just: nothing found, stop there.
+
+## Bridging Figma
+
+**Prompt**: `/margaret-design code` with a Figma frame link
+
+**Response**: converts the frame into working code matching the project's existing stack, styling approach, and design tokens — no new UI library introduced, no hardcoded values pulled straight from Figma if the project already has a token/theme system.
+
+**Prompt**: `/margaret-design context` with a Figma selection
+
+**Response**: a structure/tokens/spacing/component-name summary — no code generated, useful before a bigger build to see what's there first.
+
+## Getting the reference card
+
+**Prompt**: `/margaret-help`
+
+**Response**: the command table, intensity levels, and default-mode setup shown in [Commands & Skills](/docs/commands) and [Configuration](/docs/configuration) — a one-shot display, no mode switch.

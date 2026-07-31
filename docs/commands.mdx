@@ -1,0 +1,80 @@
+---
+title: Commands & Skills
+description: Full reference for every margaret command and skill
+---
+
+Each command has a matching skill so the same behavior triggers on natural language, not just the slash form.
+
+| Command | Args (default) | What it does |
+| --- | --- | --- |
+| `/margaret` | `lean\|full\|max\|off` (full) | Design first, implement smallest. Sticks until changed or session end. |
+| `/margaret-scan` | `[repo]` (diff) | Over-engineering scan: one line per finding, `repo` scans the whole tree instead of the diff. |
+| `/margaret-review` | — | Switches the session persona to review mode: same complexity-hunt framing as `/margaret-scan`, but holds across turns. Hidden mode, not its own skill. |
+| `/margaret-guard` | — | Security review of the current diff: high-confidence, exploitable findings only. |
+| `/margaret-design` | `design\|diagram\|code\|context\|connect\|motion` (design) | Figma bridge both ways: generate a new artifact, or pull an existing file/selection into code. |
+| `/margaret-help` | — | One-shot reference card for all of the above. |
+
+## Margaret
+
+Skill: `skills/margaret`. Triggers on the slash command, or on phrases like "margaret", "be lean", "lean mode", "simplest solution", "yagni", "do less", "shortest path", or mentions of over-engineering/bloat/boilerplate/unnecessary dependencies.
+
+Runs the 7-filter screen described in [Overview](/) before writing code. Three intensity levels — see [Configuration](/docs/configuration#intensity-levels).
+
+## Margaret Scan
+
+Skill: `skills/margaret-scan`. Hunts exclusively for complexity that doesn't earn its keep — never correctness, security, or performance.
+
+Scopes:
+- **diff** (default): only the current change.
+- **repo** (pass `repo`, or ask for an "audit"): walks the whole tree, biggest win first.
+
+Finding format: `L<line>: <tag> <finding>. <fix>.` — prefixed with `<file>:` for multi-file diffs or repo scans.
+
+Tags:
+| Tag | Meaning |
+| --- | --- |
+| `cut:` | unreachable code, unused flexibility, unrequested feature — remove, nothing replaces it |
+| `builtin:` | custom code duplicating stdlib — name the stdlib call |
+| `platform:` | dependency/handwritten code standing in for a platform capability — name the capability |
+| `overbuilt:` | one-implementation interface, unused config knob, single-caller layer |
+| `condense:` | same behavior, fewer lines — show the shorter version |
+
+Ends with `net: -<N> lines possible.` (repo scope also reports `-<M> deps possible.`). Nothing to cut: `Already lean. Ship it.` Reports findings only, applies nothing, doesn't touch the active mode.
+
+## Margaret Review
+
+Not a skill of its own — a session-level persona switch like `/margaret lean|full|max`. Once active, every reply is a complexity scan, never a rewrite. Revert with `/margaret full` or "stop margaret".
+
+## Margaret Guard
+
+Skill: `skills/margaret-guard`, command: `commands/margaret-guard.md`. High-confidence, exploitable findings only — not a general code review.
+
+Categories: input validation (SQL/command/XXE/template/NoSQL injection, path traversal) · auth (bypass, privilege escalation, session/JWT flaws) · crypto/secrets (hardcoded keys, weak algorithms, bad key storage/randomness, cert bypass) · code execution (insecure deserialization, eval injection, XSS) · data exposure (secrets/PII in logs, endpoint leakage, debug info).
+
+Only reports what's >80% confident to be exploitable. Local-network-only still counts as HIGH. Never reports: DOS/resource exhaustion, secrets on disk if otherwise secured, rate limiting, missing best-practice hardening with no concrete exploit path, test-only files, outdated third-party libraries.
+
+Optional repo config (both no-op if missing):
+- `.margaret/security-instructions.md` — extra categories/context folded into the standard set.
+- `.margaret/security-exclude` — one path glob per line (e.g. `vendor/**`); matching findings are dropped.
+
+The command form (`/margaret-guard`) runs the full procedure: gathers diff context from `git status`/`git diff`/`git log`, finds candidates in one sub-task, then filters false positives in a parallel sub-task against hard exclusions and a confidence scale, keeping only findings scored 8+/10. Output per finding: file:line, severity (HIGH/MEDIUM only), category, description, exploit scenario, fix.
+
+## Margaret Design
+
+Skill: `skills/margaret-design`. Delegates to the sibling `figma` plugin's own skills rather than reimplementing Figma access — this skill only routes to the right one and supplies project context (existing tokens, stack, component conventions).
+
+Generate:
+- **design** (default) → `figma:figma-generate-design`
+- **diagram** → `figma:figma-generate-diagram`, or `figma:figma-use-figjam` for an explicit FigJam brainstorm board
+
+Pull:
+- **code** → `figma:figma-design-to-code` — matches this project's existing stack/conventions, reuses existing design tokens instead of hardcoding
+- **context** → `figma:figma-use` — summarizes structure/tokens/spacing/components, no code generated
+- **connect** → `figma:figma-code-connect` — links code components to their Figma counterparts
+- **motion** → `figma:figma-implement-motion` — reads the motion spec and implements it with whatever animation approach the project already uses
+
+Asks for missing specifics (target file, spec, Figma link) rather than inventing intent. If the `figma` plugin isn't connected, says so and stops.
+
+## Margaret Help
+
+Skill: `skills/margaret-help`. One-shot display of this table plus levels and setup — doesn't switch modes or persist anything.

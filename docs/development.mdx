@@ -1,0 +1,37 @@
+---
+title: Development
+description: Testing, structure checks, and contributing
+---
+
+## Repo layout
+
+| Path | What it is |
+| --- | --- |
+| `skills/` | Skill definitions (`SKILL.md`) that back each slash command |
+| `commands/` | Slash-command prompts (`.toml`/`.md`) — `margaret`, `margaret-scan`, `margaret-review`, `margaret-guard`, `margaret-design`, `margaret-help` |
+| `hooks/` | Lifecycle hook scripts, config resolver, statusline scripts, uninstaller |
+| `.claude-plugin/`, `.codex-plugin/` | Host-specific plugin manifests |
+| `.cursor/`, `.windsurf/`, `.clinerules/` | Static rules-file copies for hosts with no hook system |
+| `AGENTS.md` | Always-on context file for Gemini CLI and generic agent hosts |
+| `benchmarks/` | Response-quality benchmarks comparing margaret against baseline/caveman arms |
+| `tests/` | Unit tests for hook logic (config, instructions, mode tracker, runtime, statusline, uninstall) |
+
+## Running tests
+
+```bash
+npm test
+```
+
+This runs the unit test suite, checks that every command/skill declared in `plugin.yaml` is backed by a real file (`scripts/check-structure.js`), and checks that the persona's static copies (`AGENTS.md`, `.cursor/`, `.windsurf/`, `.clinerules/`) haven't drifted from each other (`scripts/check-rule-copies.js`).
+
+## Keeping persona copies in sync
+
+The screen text is duplicated across `AGENTS.md`, `.cursor/rules/margaret.mdc`, `.windsurf/rules/margaret.md`, and `.clinerules/margaret.md` for hosts without a hook system. Edit `skills/margaret/SKILL.md` first, then propagate the change to each static copy — `npm test` fails the build if they drift.
+
+## Benchmarks
+
+`benchmarks/` scores margaret's output against a plain baseline and the `caveman` skill on correctness and lines-of-code, via `promptfooconfig.yaml` and the prompts in `prompts.json`. See `benchmarks/README.md` for how to run an eval pass.
+
+## License
+
+Margaret © 2026 by Sofia Botechia Hernandes, licensed under MIT.

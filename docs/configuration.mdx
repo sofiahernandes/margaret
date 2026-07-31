@@ -1,0 +1,78 @@
+---
+title: Configuration
+description: Intensity levels, default mode, status line, hooks
+---
+
+## Intensity levels
+
+| Level | Behavior |
+| --- | --- |
+| **lean** | Deliver what was asked for, mention a smaller alternative in passing. User decides. |
+| **full** (default) | Check each option against the 7-filter screen. Standard library and platform features win by default. |
+| **max** | Question speculative scope before any code gets written. Build only what is clearly required, and state what was cut. |
+
+Example — "Add a cache for these API responses":
+
+- **lean**: "Added it. `functools.lru_cache` would cover this in one line if a hand-rolled cache class isn't needed."
+- **full**: "`@lru_cache(maxsize=1000)` wraps the fetch call. Skipped a bespoke cache class, add one once `lru_cache` demonstrably can't keep up."
+- **max**: "Holding off on caching until a profiler flags it. Then: `@lru_cache`. A custom TTL cache just reimplements stdlib."
+
+Switch levels any time: `/margaret lean|full|max`, or turn it off: `/margaret off`, "stop margaret", "normal mode". The level sticks until changed or the session ends.
+
+## Setting the default level
+
+Priority order, checked in this sequence:
+
+1. **Environment variable**
+   ```bash
+   export MARGARET_DEFAULT_MODE=max
+   ```
+2. **Config file** — `~/.config/margaret/config.json` (or `$XDG_CONFIG_HOME/margaret/config.json` if set; `%APPDATA%\margaret\config.json` on Windows):
+   ```json
+   { "defaultMode": "lean" }
+   ```
+3. **Built-in default**: `full`.
+
+Use `"off"` to skip auto-activation and start `/margaret` by hand when wanted.
+
+## Status line
+
+Shows the current level (`[MARGARET]`, `[MARGARET:MAX]`). Not wired in automatically — add to `~/.claude/settings.json`:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash \"<plugin-root>/hooks/margaret-statusline.sh\""
+  }
+}
+```
+
+Swap in `margaret-statusline.ps1` on Windows.
+
+## Hooks
+
+Three lifecycle hooks drive the persona in hook-based hosts (`hooks/claude-hooks.json`):
+
+| Hook | Script | Purpose |
+| --- | --- | --- |
+| `SessionStart` | `margaret-activate.js` | Resolves the default mode and activates it at the start of a session (`startup`, `resume`, `clear`, `compact`). |
+| `SubagentStart` | `margaret-subagent.js` | Propagates the active mode into subagents so they inherit the same screen. |
+| `UserPromptSubmit` | `margaret-mode-tracker.js` | Tracks mode-switch phrases in the user's message (e.g. "stop margaret", `/margaret max`) and updates the active mode. |
+
+Mode resolution logic lives in `hooks/margaret-config.js`, shared by all three hooks.
+
+## Security review config
+
+Optional, both no-op if absent:
+
+- `.margaret/security-instructions.md` — extra categories/context appended to `/margaret-guard`'s standard set.
+- `.margaret/security-exclude` — one path glob per line (e.g. `vendor/**`), findings in matching files are dropped.
+
+## Uninstalling cleanly
+
+Run before removing the plugin — it only removes the `statusLine` segment margaret owns, leaving any combined statusline intact:
+
+```bash
+node scripts/uninstall.js
+```

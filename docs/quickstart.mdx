@@ -1,0 +1,64 @@
+---
+title: Quickstart
+description: Install margaret in your host of choice
+---
+
+Node.js needs to be on your PATH for the hook-based hosts below — if it isn't, the skills still work, the always-on activation just stays quiet instead of erroring on every prompt.
+
+## Claude Code
+
+Two separate prompts:
+
+```
+/plugin marketplace add sofiahernandes/margaret
+/plugin install margaret@margaret
+```
+
+## Codex
+
+```
+codex plugin marketplace add sofiahernandes/margaret
+codex plugin add margaret@margaret
+```
+
+Run `codex` and open `/hooks` to review and trust the two lifecycle hooks (reused from Claude Code's `hooks/claude-hooks.json`).
+
+## Gemini CLI
+
+Gemini has no hook system, so it loads `AGENTS.md` as always-on context instead of switching modes — the screen always applies.
+
+```
+gemini extensions install https://github.com/sofiahernandes/margaret
+```
+
+## Cursor / Windsurf / Cline
+
+None of these three run hooks either. Copy the matching rules file into your project:
+
+- Cursor: `.cursor/rules/margaret.mdc`
+- Windsurf: `.windsurf/rules/margaret.md`
+- Cline: `.clinerules/margaret.md`
+
+## GitHub Copilot / Qoder
+
+Reference-only, not a packaged install: `hooks/copilot-hooks.json` and `hooks/qoder-hooks.json` document the hook shape those tools expect. Wire them into that tool's own settings by hand.
+
+## First run
+
+Once installed, `/margaret` is active at level `full` from the start of every session (hook-based hosts). Try:
+
+```
+/margaret-help
+```
+
+for the full reference card, or just start coding — the persona is already applying the screen.
+
+## Uninstall
+
+Removing the plugin (marketplace remove / delete the checkout) doesn't touch state margaret wrote elsewhere: the mode flag, `~/.config/margaret/config.json`, and (if wired up) a `statusLine` entry in `~/.claude/settings.json`. **Run this before removing the plugin** — the script is itself a plugin file:
+
+```
+node scripts/uninstall.js
+```
+
+It only removes the `statusLine` segment it owns, so a statusline combined with another plugin's is left otherwise intact.
