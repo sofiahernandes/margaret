@@ -3,5 +3,10 @@
   "version": "1.0.0",
   "description": "Senior-engineer productivity toolkit: lean-code enforcement, over-engineering scans, security review, and a Figma design/code bridge.",
   "license": "MIT",
-  "hooks": "./hooks/claude-hooks.json"
+  "hooks": "./hooks/claude-hooks.json",
+  "author": {
+    "name": "Sofia Botechia Hernandes",
+    "email": "sofiahernandes.dev@gmail.com",
+    "url": "https://github.com/sofiahernandes"
+  }
 }

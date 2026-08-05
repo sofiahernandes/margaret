@@ -2,6 +2,11 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "margaret",
   "description": "Named for Margaret Hamilton. A propulsion toolkit for developers: write leaner code, catch over-engineering, catch security bugs, bridge Figma and code.",
+  "owner": {
+    "name": "Sofia Botechia Hernandes",
+    "email": "sofiahernandes.dev@gmail.com",
+    "url": "https://github.com/sofiahernandes"
+  },
   "plugins": [
     {
       "name": "margaret",
