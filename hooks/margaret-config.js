@@ -19,16 +19,18 @@ const RUNTIME_MODES = ["off", "lean", "full", "max"];
 // become the persisted default — see writeDefaultMode.
 const VALID_MODES = ["off", "lean", "full", "max", "review"];
 
-function normalizeMode(mode) {
+function normalizeAgainst(mode, list) {
   if (typeof mode !== "string") return null;
   const normalized = mode.trim().toLowerCase();
-  return RUNTIME_MODES.includes(normalized) ? normalized : null;
+  return list.includes(normalized) ? normalized : null;
+}
+
+function normalizeMode(mode) {
+  return normalizeAgainst(mode, RUNTIME_MODES);
 }
 
 function normalizeConfigMode(mode) {
-  if (typeof mode !== "string") return null;
-  const normalized = mode.trim().toLowerCase();
-  return VALID_MODES.includes(normalized) ? normalized : null;
+  return normalizeAgainst(mode, VALID_MODES);
 }
 
 function normalizePersistedMode(mode) {

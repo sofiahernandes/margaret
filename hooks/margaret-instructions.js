@@ -116,25 +116,22 @@ function getFallbackInstructions(mode) {
   );
 }
 
+function header(mode) {
+  return "MARGARET MODE ACTIVE — level: " + mode + "\n\n";
+}
+
 function getMargaretInstructions(mode) {
   const configuredMode = normalizePersistedMode(mode) || DEFAULT_MODE;
 
   if (INDEPENDENT_MODES.has(configuredMode)) {
-    return (
-      "MARGARET MODE ACTIVE — level: " +
-      configuredMode +
-      "\n\n" +
-      REVIEW_INSTRUCTIONS
-    );
+    return header(configuredMode) + REVIEW_INSTRUCTIONS;
   }
 
   const effectiveMode = normalizeMode(configuredMode) || DEFAULT_MODE;
 
   try {
     return (
-      "MARGARET MODE ACTIVE — level: " +
-      effectiveMode +
-      "\n\n" +
+      header(effectiveMode) +
       filterSkillBodyForMode(fs.readFileSync(SKILL_PATH, "utf8"), effectiveMode)
     );
   } catch (e) {
