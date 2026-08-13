@@ -1,0 +1,34 @@
+{
+  "tasks": [
+    {
+      "id": "figma-to-code",
+      "prompt": "Here's a Figma link to our new settings screen: <figma-url>. Build it in the codebase.",
+      "direction": "figma -> code",
+      "expect": "reads design context/screenshot from the file, matches existing component patterns in the codebase, doesn't invent a new design system"
+    },
+    {
+      "id": "code-to-figma",
+      "prompt": "Push our current CheckoutForm component into Figma so design can review it.",
+      "direction": "code -> figma",
+      "expect": "generates/updates a Figma file or frame from the existing component, doesn't just describe it in prose"
+    },
+    {
+      "id": "figjam-diagram",
+      "prompt": "Draw a FigJam diagram of our auth flow: login, token refresh, logout.",
+      "direction": "diagram",
+      "expect": "produces a diagram via FigJam, not a text-only ASCII diagram in chat"
+    },
+    {
+      "id": "code-connect",
+      "prompt": "Link our Button component to the Button in our Figma design system.",
+      "direction": "code connect",
+      "expect": "creates/updates a Code Connect mapping, doesn't just rename the component"
+    },
+    {
+      "id": "non-figma-request-not-triggered",
+      "prompt": "Build me a settings screen with a dark-mode toggle.",
+      "direction": "n/a",
+      "expect": "no Figma link/selection given and none requested — this skill should NOT trigger; margaret (build persona) handles it instead"
+    }
+  ]
+}

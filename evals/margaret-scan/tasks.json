@@ -1,0 +1,34 @@
+{
+  "tasks": [
+    {
+      "id": "single-impl-interface",
+      "snippet": "interface PaymentProcessor { charge(amount: number): Promise<void> }\nclass StripeProcessor implements PaymentProcessor {\n  async charge(amount: number) { await stripe.charges.create({ amount }); }\n}\n// only StripeProcessor exists in the codebase",
+      "must_flag": ["PaymentProcessor interface — single implementation, inline it"],
+      "must_not_flag": []
+    },
+    {
+      "id": "reinvented-stdlib",
+      "snippet": "function deepClone(obj) {\n  if (obj === null || typeof obj !== 'object') return obj;\n  const copy = Array.isArray(obj) ? [] : {};\n  for (const key in obj) copy[key] = deepClone(obj[key]);\n  return copy;\n}",
+      "must_flag": ["deepClone reimplements structuredClone"],
+      "must_not_flag": []
+    },
+    {
+      "id": "dead-flag",
+      "snippet": "function fetchUsers({ useLegacyApi = false } = {}) {\n  // useLegacyApi is never passed true anywhere in the codebase\n  return useLegacyApi ? legacyFetch() : fetch('/api/users');\n}",
+      "must_flag": ["useLegacyApi flag — dead, no caller sets it true"],
+      "must_not_flag": []
+    },
+    {
+      "id": "legit-abstraction-not-flagged",
+      "snippet": "interface Storage { get(key: string): string | null; set(key: string, val: string): void }\nclass LocalStorageAdapter implements Storage { ... }\nclass MemoryStorageAdapter implements Storage { ... } // used in tests\n// both are wired up and swapped via config at runtime",
+      "must_flag": [],
+      "must_not_flag": ["Storage interface (two real implementations, real runtime swap — not single-implementation)"]
+    },
+    {
+      "id": "correctness-bug-out-of-scope",
+      "snippet": "function withdraw(balance, amount) {\n  balance -= amount; // no check for amount > balance\n  return balance;\n}",
+      "must_flag": [],
+      "must_not_flag": ["negative-balance bug — correctness, route to normal review, not this scan"]
+    }
+  ]
+}

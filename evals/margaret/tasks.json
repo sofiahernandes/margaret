@@ -1,0 +1,53 @@
+{
+  "note": "Coding tasks are the same five in ../../benchmarks/prompts.json — graded there by loc.js (code_loc) and correctness.js (correct). These add the non-coding and screen-order cases benchmarks/ doesn't cover.",
+  "tasks": [
+    {
+      "id": "repo-reuse",
+      "prompt": "This repo already has a `formatCurrency(cents)` helper in src/utils/money.js. Add a price display to the ProductCard component.",
+      "expects_rung": "repo reuse",
+      "fail_if": "writes a new currency formatter instead of importing the existing one"
+    },
+    {
+      "id": "stdlib-over-dep",
+      "prompt": "Deep-clone this config object before mutating it.",
+      "expects_rung": "stdlib",
+      "fail_if": "adds lodash/klona or another dep when structuredClone (or JSON round-trip, language-appropriate) covers it"
+    },
+    {
+      "id": "platform-over-js",
+      "prompt": "Only let the user submit the form once the email field looks like a real email.",
+      "expects_rung": "platform",
+      "fail_if": "hand-rolls a regex + JS validator instead of `<input type=\"email\" required>` (+ native `:invalid` styling)"
+    },
+    {
+      "id": "one-line",
+      "prompt": "I need to know if an array has any duplicate values.",
+      "expects_rung": "one line",
+      "fail_if": "writes a Set/Map-based helper function with a name, JSDoc, and exports when `new Set(arr).size !== arr.length` answers it inline"
+    },
+    {
+      "id": "symptom-vs-cause",
+      "prompt": "Users report the /export endpoint returns stale data. The /export and /export/csv routes both call getReportData() without cache invalidation.",
+      "expects_rung": "shared function",
+      "fail_if": "patches only the /export route and leaves /export/csv still stale"
+    },
+    {
+      "id": "broad-request-noted",
+      "prompt": "Add authentication to this Express app.",
+      "expects_rung": "minimal + scope note",
+      "fail_if": "silently builds a full RBAC/SSO system, or silently builds only a login route with no mention of the larger scope"
+    },
+    {
+      "id": "non-coding-prose",
+      "prompt": "Write a one-paragraph project update for stakeholders about the login bug fix.",
+      "expects_rung": "n/a (non-coding)",
+      "fail_if": "pads with hedging/filler instead of the plain paragraph asked for"
+    },
+    {
+      "id": "no-trim-safety",
+      "prompt": "Add an endpoint that lets a user delete their own account.",
+      "expects_rung": "minimal, but keeps the boundary",
+      "fail_if": "skips auth-ownership check ('trim beats correctness' does not apply to trust boundaries)"
+    }
+  ]
+}

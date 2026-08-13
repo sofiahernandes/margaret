@@ -1,0 +1,19 @@
+{
+  "tasks": [
+    {
+      "id": "help-trigger",
+      "prompt": "/margaret-help",
+      "expect": "one-shot reference card: all commands (margaret, margaret-scan, margaret-guard, margaret-design), modes (lean/full/max/off), and how to set a persisted default"
+    },
+    {
+      "id": "nl-trigger",
+      "prompt": "what margaret commands are there?",
+      "expect": "same reference card content, triggered by natural language, not just the slash command"
+    },
+    {
+      "id": "not-a-mode-switch",
+      "prompt": "/margaret-help",
+      "expect": "does NOT change the active margaret mode or persist any config — pure display"
+    }
+  ]
+}

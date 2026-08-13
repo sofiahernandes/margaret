@@ -1,0 +1,46 @@
+{
+  "tasks": [
+    {
+      "id": "sql-injection",
+      "snippet": "app.get('/user', (req, res) => {\n  db.query(`SELECT * FROM users WHERE id = ${req.query.id}`, (err, rows) => res.json(rows));\n});",
+      "must_flag": ["SQL injection via string-interpolated req.query.id"],
+      "must_not_flag": []
+    },
+    {
+      "id": "authz-bypass",
+      "snippet": "app.delete('/orders/:id', requireLogin, (req, res) => {\n  orders.delete(req.params.id); // no check that req.user owns this order\n  res.sendStatus(204);\n});",
+      "must_flag": ["missing ownership check — any logged-in user can delete any order"],
+      "must_not_flag": []
+    },
+    {
+      "id": "hardcoded-secret",
+      "snippet": "const JWT_SECRET = 'super-secret-key-123';\njwt.sign(payload, JWT_SECRET);",
+      "must_flag": ["hardcoded JWT secret committed to source"],
+      "must_not_flag": []
+    },
+    {
+      "id": "xss",
+      "snippet": "el.innerHTML = '<div>' + userComment + '</div>';",
+      "must_flag": ["XSS via unescaped userComment into innerHTML"],
+      "must_not_flag": []
+    },
+    {
+      "id": "rate-limit-out-of-scope",
+      "snippet": "app.post('/login', (req, res) => {\n  // no rate limiting on login attempts\n  return auth.check(req.body.user, req.body.pass);\n});",
+      "must_flag": [],
+      "must_not_flag": ["missing rate limiting — DOS/brute-force concern, explicitly filtered out"]
+    },
+    {
+      "id": "theoretical-out-of-scope",
+      "snippet": "function add(a, b) {\n  return a + b; // could theoretically overflow Number.MAX_SAFE_INTEGER\n}",
+      "must_flag": [],
+      "must_not_flag": ["Number overflow — theoretical, not exploitable here"]
+    },
+    {
+      "id": "safe-parameterized-query",
+      "snippet": "db.query('SELECT * FROM users WHERE id = $1', [req.query.id], (err, rows) => res.json(rows));",
+      "must_flag": [],
+      "must_not_flag": ["parameterized query — not injectable, must not be flagged"]
+    }
+  ]
+}
