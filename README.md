@@ -9,7 +9,7 @@
 
 ### Why "Margaret"
 
-> Named for [Margaret Hamilton](https://science-nasa-gov.translate.goog/people/margaret-hamilton/?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc), the lead software engineer for the Apollo Program's onboard flight software. Her team's code had to run on hardware with almost no memory or cycles to spare, survive real-time failure during a moon landing, and be provably correct because there was no patching it in flight. That's the standard this plugin borrows: engineered and reliable, no more than the mission needs.
+Named for [Margaret Hamilton](https://science-nasa-gov.translate.goog/people/margaret-hamilton/?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc), the lead software engineer for the Apollo Program's onboard flight software. Her team's code had to run on hardware with almost no memory or cycles to spare, survive real-time failure during a moon landing, and be provably correct because there was no patching it in flight. That's the standard this plugin borrows: engineered and reliable, no more than the mission needs.
 
 <br/>
 
@@ -39,6 +39,54 @@ Before writing code, the agent runs the candidate through a set of filters and b
 ```
 
 These filters only work once the problem is understood — the agent reads the code the change touches and traces the real flow before picking one. Never trimmed away: input validation at trust boundaries, error handling that prevents data loss, security, accessibility, anything explicitly requested. A shortcut that cuts a real corner gets a `margaret:` comment naming the ceiling and the upgrade path; non-trivial logic leaves one runnable check behind.
+
+<br/>
+
+### Example
+
+Without Margaret:
+```typescript
+function getDateVariants(date: string): string[] {
+  const parts = date.split('-')
+  const yyyy = parts[0]
+  const mm = parts[1]
+  const dd = parts[2]
+
+  if (!yyyy || !mm || !dd) {
+    return []
+  }
+
+  const normalizedDay = String(Number(dd))
+  const normalizedMonth = String(Number(mm))
+  const normalizedYear = String(Number(yyyy))
+
+  const formattedOriginal = `${dd}-${mm}-${yyyy}`
+  const formattedNormalized = `${normalizedDay}-${normalizedMonth}-${normalizedYear}`
+
+  const variants = new Set<string>()
+
+  for (const candidate of [formattedOriginal, formattedNormalized]) {
+    if (candidate) {
+      variants.add(candidate)
+    }
+  }
+
+  return [...variants]
+}
+```
+
+With Margaret:
+```typescript
+function getDateVariants(date: string): string[] {
+  const [yyyy, mm, dd] = date.split('-')
+  if (!yyyy || !mm || !dd) return []
+
+  return [...new Set([
+    `${dd}-${mm}-${yyyy}`,
+    `${+dd}-${+mm}-${+yyyy}`,
+  ])]
+}
+```
 
 <br/>
 
