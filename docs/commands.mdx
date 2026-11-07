@@ -3,7 +3,7 @@ title: Commands & Skills
 description: Full reference for every margaret command and skill
 ---
 
-Each command has a matching skill so the same behavior triggers on natural language, not just the slash form.
+Most commands have a matching skill, so the same behavior triggers on natural language and not just the slash form. Two skills have no command; two commands have no skill. Both tables below.
 
 | Command | Args (default) | What it does |
 | --- | --- | --- |
@@ -12,7 +12,16 @@ Each command has a matching skill so the same behavior triggers on natural langu
 | `/margaret-review` | — | Switches the session persona to review mode: same complexity-hunt framing as `/margaret-scan`, but holds across turns. Hidden mode, not its own skill. |
 | `/margaret-guard` | — | Security review of the current diff: high-confidence, exploitable findings only. |
 | `/margaret-design` | `design\|diagram\|code\|context\|connect\|motion` (design) | Figma bridge both ways: generate a new artifact, or pull an existing file/selection into code. |
+| `/margaret-init` | — | Detect the stack, write the two context tiers, report what's missing. The only command that proposes repo-config fixes. |
+| `/margaret-ship` | — | The per-change loop: preflight → scan → guard → docs. Fail-fast, interactive. |
 | `/margaret-help` | — | One-shot reference card for all of the above. |
+
+Skills with no command of their own:
+
+| Skill | Triggers on |
+| --- | --- |
+| `margaret-preflight` | "run the tests", "run the checks", "lint this", "typecheck", "is this green" |
+| `margaret-docs` | "update the docs", "document this", "add a changelog entry" |
 
 ## Margaret
 
@@ -49,6 +58,8 @@ Not a skill of its own — a session-level persona switch like `/margaret lean|f
 
 Skill: `skills/margaret-guard`, command: `commands/margaret-guard.md`. High-confidence, exploitable findings only — not a general code review.
 
+The skill is the single source for what counts as a finding: categories, the confidence bar, the never-report list, the precedents, the method, and the report format. The command adds only the execution procedure — git context gathering and the parallel false-positive fan-out — and loads the skill for the standard rather than restating it.
+
 Categories: input validation (SQL/command/XXE/template/NoSQL injection, path traversal) · auth (bypass, privilege escalation, session/JWT flaws) · crypto/secrets (hardcoded keys, weak algorithms, bad key storage/randomness, cert bypass) · code execution (insecure deserialization, eval injection, XSS) · data exposure (secrets/PII in logs, endpoint leakage, debug info).
 
 Only reports what's >80% confident to be exploitable. Local-network-only still counts as HIGH. Never reports: DOS/resource exhaustion, secrets on disk if otherwise secured, rate limiting, missing best-practice hardening with no concrete exploit path, test-only files, outdated third-party libraries.
@@ -57,7 +68,7 @@ Optional repo config (both no-op if missing):
 - `.margaret/security-instructions.md` — extra categories/context folded into the standard set.
 - `.margaret/security-exclude` — one path glob per line (e.g. `vendor/**`); matching findings are dropped.
 
-The command form (`/margaret-guard`) runs the full procedure: gathers diff context from `git status`/`git diff`/`git log`, finds candidates in one sub-task, then filters false positives in a parallel sub-task against hard exclusions and a confidence scale, keeping only findings scored 8+/10. Output per finding: file:line, severity (HIGH/MEDIUM only), category, description, exploit scenario, fix.
+The command form (`/margaret-guard`) runs the full procedure: gathers diff context from `git status`/`git diff`/`git log`, finds candidates in one sub-task, then filters false positives in a parallel sub-task against the skill's never-report list, precedents, and confidence scale, keeping only findings scored 8+/10. Invoking the skill alone applies the same standard as a single read-through, without the fan-out.
 
 ## Margaret Design
 
@@ -73,8 +84,42 @@ Pull:
 - **connect** → `figma:figma-code-connect` — links code components to their Figma counterparts
 - **motion** → `figma:figma-implement-motion` — reads the motion spec and implements it with whatever animation approach the project already uses
 
-Asks for missing specifics (target file, spec, Figma link) rather than inventing intent. If the `figma` plugin isn't connected, says so and stops.
+Asks for missing specifics (target file, spec, Figma link) rather than inventing intent.
+
+Routes by capability, not by server name: the sibling `figma` plugin's skills first, then any other connected Figma MCP matched on what it can do, and if nothing is reachable it names the missing setup and stops. `code` mode emits everything the codebase needs for the design to actually run — inferred by reading a comparable existing feature, not from a convention file alone. Values map to the project's existing tokens; an unmapped one is proposed as a new token and waits, never hardcoded.
+
+## Margaret Preflight
+
+Skill: `skills/margaret-preflight`. Triggers on "run the tests", "run the checks", "lint this", "typecheck", "is this green". Step 1 of `/margaret-ship`.
+
+Runs the repo's own checks cheapest-first — typecheck, lint, test — falling back to the tool's direct invocation (`tsc --noEmit`) when no script is wired up, and saying so. Missing checks are listed once as gaps with no fix proposed; `/margaret-init` owns that. Failures quote the decisive line, never the full log. Already-installed dead-code tooling (`knip`, `jscpd`) is run and its findings handed to `/margaret-scan` as evidence.
+
+Execution only: never `--fix`, never edits a file.
+
+## Margaret Docs
+
+Skill: `skills/margaret-docs`. Triggers on "update the docs", "document this", "add a changelog entry". Step 4 of `/margaret-ship`.
+
+Realigns documentation with one specific change, scoped to what that change actually invalidated — a one-line fix earns a one-line changelog entry and nothing else. Split by blast radius: `.margaret/*` and the changelog are **written**; README, anything under a docs tree, agent context files, and inline comments are **proposed and awaited**. A docs directory with a site config is treated as published.
+
+Comments are left alone unless the change made one false.
+
+## Margaret Init
+
+Command only: `commands/margaret-init.md`. Run once per repo, re-runnable.
+
+Detects the stack, then writes two tiers: a fenced block of five lines or fewer in `AGENTS.md` (always in context — one-line stack plus damage-prevention constraints), and the detail in `.margaret/`. Regenerates strictly between `<!-- margaret:start -->` and `<!-- margaret:end -->`, so prose outside the fences survives. `.margaret/stack.md` carries a source-hash marker that `scripts/stack-hash.js` checks for ~20 tokens instead of re-reading files.
+
+Shows the full diff and waits. Reports gaps — no test command, no typecheck script, a CI job invoking a runner the repo lacks — only when they exist.
+
+## Margaret Ship
+
+Command only: `commands/margaret-ship.md`.
+
+Runs `margaret-preflight` → `margaret-scan` → `margaret-guard` → `margaret-docs` against the same change set, each step independent. Stops at the first failure, reports it, offers the fix, re-runs that step, continues — findings about code that's about to change are findings you pay for twice.
+
+Interactive by design; don't wire it to a hook or to CI. CI should run the deterministic half directly (`npm run typecheck`, `npm run lint`, `npm test`) — no tokens, no agent.
 
 ## Margaret Help
 
-Skill: `skills/margaret-help`. One-shot display of this table plus levels and setup — doesn't switch modes or persist anything.
+Command only: `commands/margaret-help.md`. One-shot display of this table plus levels and setup — doesn't switch modes or persist anything.

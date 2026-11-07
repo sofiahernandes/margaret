@@ -7,14 +7,14 @@ description: Testing, structure checks, and contributing
 
 | Path | What it is |
 | --- | --- |
-| `skills/` | Skill definitions (`SKILL.md`) that back each slash command |
-| `commands/` | Slash-command prompts (`.toml`/`.md`) — `margaret`, `margaret-scan`, `margaret-review`, `margaret-guard`, `margaret-design`, `margaret-help` |
+| `skills/` | Skill definitions (`SKILL.md`). Most back a slash command; `margaret-preflight` and `margaret-docs` trigger from natural language only |
+| `commands/` | Slash-command prompts (`.toml`/`.md`) — `margaret`, `margaret-scan`, `margaret-review`, `margaret-guard`, `margaret-design`, `margaret-init`, `margaret-ship`, `margaret-help` |
 | `hooks/` | Lifecycle hook scripts, config resolver, statusline scripts, uninstaller |
 | `.claude-plugin/`, `.codex-plugin/` | Host-specific plugin manifests |
 | `.cursor/`, `.windsurf/`, `.clinerules/` | Static rules-file copies for hosts with no hook system |
 | `AGENTS.md` | Always-on context file for Gemini CLI and generic agent hosts |
 | `benchmarks/` | Response-quality benchmarks comparing margaret against baseline/caveman arms |
-| `tests/` | Unit tests for hook logic (config, instructions, mode tracker, runtime, statusline, uninstall) |
+| `tests/` | Unit tests for hook logic (config, instructions, mode tracker, runtime, statusline, uninstall) and the stack-hash freshness check |
 
 ## Running tests
 
