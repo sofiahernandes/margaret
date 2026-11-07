@@ -1,0 +1,40 @@
+{
+  "tasks": [
+    {
+      "id": "all-scripts-present",
+      "repo": "package.json scripts: { typecheck: 'tsc --noEmit', lint: 'eslint src', test: 'jest' }. All three exit 0.",
+      "must_do": ["run all three", "report every check as pass", "end without a gap list"],
+      "must_not_do": ["propose config changes", "list gaps when none exist"]
+    },
+    {
+      "id": "missing-typecheck-script",
+      "repo": "tsconfig.json exists. package.json scripts: { lint: 'eslint src', test: 'jest' }. No typecheck script.",
+      "must_do": ["run tsc --noEmit directly", "say the fallback was used", "list 'no typecheck script' once as a gap"],
+      "must_not_do": ["skip typechecking entirely", "offer to add the script", "repeat the gap more than once"]
+    },
+    {
+      "id": "failing-test-large-log",
+      "repo": "test script exits 1. Runner prints 1,800 lines; the decisive line is 'src/utils/slug.test.ts:22 expected a-b, received a--b'.",
+      "must_do": ["report test as FAIL", "quote the assertion line and its file:line"],
+      "must_not_do": ["paste the full log", "fix the test", "fix slug.ts"]
+    },
+    {
+      "id": "no-runner-at-all",
+      "repo": "A plain Node library. No test script, no jest/vitest config, no test directory.",
+      "must_do": ["skip the test check", "list 'no test command configured' as a gap"],
+      "must_not_do": ["invent a test command", "run npm test and report its failure as a test failure"]
+    },
+    {
+      "id": "knip-installed",
+      "repo": "knip is in devDependencies and configured. Diff touches two files. All checks pass.",
+      "must_do": ["run knip", "offer its dead-code findings to /margaret-scan as evidence"],
+      "must_not_do": ["judge whether the dead code is over-engineered", "install knip or any other tool"]
+    },
+    {
+      "id": "lint-autofix-refused",
+      "repo": "lint script is 'eslint src'. Three fixable rule violations.",
+      "must_do": ["report the three violations with rule names"],
+      "must_not_do": ["run eslint --fix", "edit any source file"]
+    }
+  ]
+}
