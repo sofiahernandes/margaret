@@ -1,0 +1,53 @@
+{
+  "tasks": [
+    {
+      "id": "one-line-bugfix",
+      "diff": "src/utils/slug.ts — one line changed, double hyphens no longer collapse. No API change.",
+      "repo": "HISTORY.md, README.md, docs/ (mintlify, docs.json present), .margaret/stack.md",
+      "must_do": ["write one HISTORY.md entry saying what broke and why it mattered"],
+      "must_not_do": ["touch README.md", "touch docs/", "touch .margaret/stack.md", "add inline comments to slug.ts"]
+    },
+    {
+      "id": "new-env-var",
+      "diff": "Adds a required CMS_PREVIEW_TOKEN env var, read at startup, documented nowhere.",
+      "repo": "HISTORY.md, README.md with a Setup section listing env vars, .env.example",
+      "must_do": ["write the HISTORY.md entry", "propose the README setup diff and wait"],
+      "must_not_do": ["write README.md without approval"]
+    },
+    {
+      "id": "published-docs-site",
+      "diff": "Renames a CLI flag --out to --output. docs/commands.mdx documents the old flag.",
+      "repo": "docs/*.mdx with docs.json — builds to a public site",
+      "must_do": ["detect the docs site config", "propose the docs/commands.mdx diff and wait", "write the HISTORY.md entry"],
+      "must_not_do": ["write to docs/commands.mdx without approval"]
+    },
+    {
+      "id": "stack-changed",
+      "diff": "Adds a typecheck script to package.json and vitest to devDependencies.",
+      "repo": ".margaret/stack.md with a margaret:sources marker, HISTORY.md",
+      "must_do": ["check freshness with the stack-hash script", "rewrite .margaret/stack.md between its fences", "refresh the sources marker", "write the HISTORY.md entry"],
+      "must_not_do": ["read package.json into context before checking the hash", "edit anything outside the fences"]
+    },
+    {
+      "id": "nothing-drifted",
+      "diff": "Renames a local variable inside one private function.",
+      "repo": "HISTORY.md, README.md, .margaret/",
+      "must_do": ["report that docs are current and stop"],
+      "must_not_do": ["write a changelog entry", "touch any file"]
+    },
+    {
+      "id": "stale-comment-now-wrong",
+      "diff": "retry() changed from 3 attempts to 5. The comment above it still says 'retries up to 3 times'.",
+      "repo": "HISTORY.md",
+      "must_do": ["fix the comment — it now states something false", "write the HISTORY.md entry"],
+      "must_not_do": ["add new explanatory comments to the surrounding code"]
+    },
+    {
+      "id": "pt-br-changelog",
+      "diff": "A bugfix in a repo whose HISTORY.md entries are all written in pt-BR.",
+      "repo": "HISTORY.md in pt-BR, reverse-chronological, '## YYYY-MM-DD — Título' format",
+      "must_do": ["write the entry in pt-BR", "match the existing heading format", "put it at the top"],
+      "must_not_do": ["switch the file to English", "reformat existing entries"]
+    }
+  ]
+}
