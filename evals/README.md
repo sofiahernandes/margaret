@@ -1,11 +1,11 @@
 # Evals
 
-Pass/fail criteria and mock tasks for every margaret skill. Where
+Pass/fail criteria and mock tasks for every margaret skill, plus the one command graded like one. Where
 `benchmarks/` already measures a skill quantitatively (code size, cost,
 runtime correctness), evals here add the judgment-based checks that harness
 can't grade automatically — reused, not duplicated.
 
-One folder per skill, each with:
+One folder per graded surface, each with:
 
 - `tasks.json` — mock inputs (a diff, a repo snapshot, a query)
 - `RUBRIC.md` — the pass/fail bar for that skill's output
@@ -16,7 +16,9 @@ One folder per skill, each with:
 | `margaret-scan` | [`margaret-scan/`](margaret-scan/) | known-bloat recall/precision |
 | `margaret-guard` | [`margaret-guard/`](margaret-guard/) | known-vuln recall + known-safe precision |
 | `margaret-design` | [`margaret-design/`](margaret-design/) | direction + fidelity checklist |
-| `margaret-help` | [`margaret-help/`](margaret-help/) | completeness + one-shot-only checklist |
+| `margaret-preflight` | [`margaret-preflight/`](margaret-preflight/) | execution fidelity + report-only precision |
+| `margaret-docs` | [`margaret-docs/`](margaret-docs/) | scope accuracy + write-vs-propose boundary |
+| `/margaret-help` (command) | [`margaret-help/`](margaret-help/) | completeness + one-shot-only checklist |
 
 ## Running
 

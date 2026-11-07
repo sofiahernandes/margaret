@@ -20,6 +20,16 @@ Two scopes:
 - **diff** (default): only the current change is in play.
 - **repo** (pass `repo`, or the user asks for an "audit"/"whole codebase"): walk the full tree instead, biggest win listed first. Look for: packages duplicating stdlib or platform behavior, interfaces with exactly one implementer, factories manufacturing a single product, pass-through wrappers that add no behavior, single-export files, unused flags/config, and homegrown reimplementations of stdlib functions.
 
+Diff scope is the branch against its upstream default — the same three commands `/margaret-guard` uses, so both skills always see the same change set:
+
+```bash
+git diff --name-only origin/HEAD...   # files
+git log --no-decorate origin/HEAD...  # commits
+git diff --merge-base origin/HEAD     # content
+```
+
+No upstream (detached HEAD, or no `origin`)? Fall back to `git diff HEAD` and say which scope you used.
+
 ## Reporting shape
 
 `L<line>: <tag> <finding>. <fix>.` — prefix with `<file>:` for anything spanning multiple files (diffs with several files, or a repo scan).

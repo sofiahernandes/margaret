@@ -98,7 +98,11 @@ function getDateVariants(date: string): string[] {
 | `/margaret-design` | `design\|diagram\|code\|context\|connect\|motion` (design) | Figma bridge both ways: generate a new artifact, or pull an existing file/selection into code. |
 | `/margaret-guard`  | —                                                          | Security review of the current diff: high-confidence, exploitable findings only.               |
 | `/margaret-scan`   | `[repo]` (diff)                                            | Over-engineering scan: one line per finding, `repo` scans the whole tree instead of the diff.  |
+| `/margaret-init`   | —                                                          | Set the repo up for the rest: detect the stack, write the context tiers, report what's missing. |
+| `/margaret-ship`   | —                                                          | Per-change loop: checks, over-engineering scan, security pass, docs. Stops at the first failure. |
 | `/margaret-help`   | —                                                          | Reference card for all of the above.                                                           |
+
+Two skills trigger from natural language with no command of their own: **`margaret-preflight`** runs the repo's own checks ("run the tests", "typecheck") and **`margaret-docs`** realigns changelog and docs with a change that just landed ("update the docs"). Both are steps of `/margaret-ship`.
 
 Set the level for every new session with `MARGARET_DEFAULT_MODE` (`lean`/`full`/`max`/`off`), or a `defaultMode` field in `~/.config/margaret/config.json` (`%APPDATA%\margaret\config.json` on Windows). Default is `full`.
 
