@@ -37,7 +37,6 @@ function readMode() {
 
 function writeHookOutput(event, mode, context = "") {
   if (isCopilot) {
-    // Copilot reads additionalContext on SessionStart; ignores output elsewhere.
     process.stdout.write(
       JSON.stringify(
         event === "SessionStart" && context
@@ -47,21 +46,10 @@ function writeHookOutput(event, mode, context = "") {
     );
     return;
   }
-  if (isCodex) {
-    const output = { systemMessage: `MARGARET:${mode.toUpperCase()}` };
-    if (context) {
-      output.hookSpecificOutput = {
-        hookEventName: event,
-        additionalContext: context,
-      };
-    }
-    process.stdout.write(JSON.stringify(output));
-    return;
-  }
-  if (isQoder) {
-    // Qoder: hookSpecificOutput JSON, same shape as Codex minus systemMessage.
-    // UserPromptSubmit additionalContext is injected into the Agent's conversation.
+  const needsJson = isCodex || isQoder || event === "SubagentStart";
+  if (needsJson) {
     const output = {};
+    if (isCodex) output.systemMessage = `MARGARET:${mode.toUpperCase()}`;
     if (context) {
       output.hookSpecificOutput = {
         hookEventName: event,
@@ -69,22 +57,31 @@ function writeHookOutput(event, mode, context = "") {
       };
     }
     process.stdout.write(JSON.stringify(output));
-    return;
-  }
-  // Native Claude: SessionStart accepts raw stdout, but SubagentStart needs the
-  // hookSpecificOutput JSON form or the context is dropped.
-  if (event === "SubagentStart") {
-    process.stdout.write(
-      JSON.stringify({
-        hookSpecificOutput: {
-          hookEventName: event,
-          additionalContext: context,
-        },
-      }),
-    );
     return;
   }
   process.stdout.write(context);
+}
+
+function readStdin(callback, timeoutMs = 1000) {
+  let input = "";
+  let done = false;
+  function finish() {
+    if (done) return;
+    done = true;
+    callback(input);
+  }
+  process.stdin.on("data", (chunk) => {
+    input += chunk;
+  });
+  process.stdin.on("end", finish);
+  process.stdin.on("error", () => {
+    finish();
+    process.exit(0);
+  });
+  setTimeout(() => {
+    finish();
+    process.exit(0);
+  }, timeoutMs).unref();
 }
 
 module.exports = {
@@ -93,6 +90,7 @@ module.exports = {
   isCopilot,
   isQoder,
   readMode,
+  readStdin,
   setMode,
   writeHookOutput,
 };

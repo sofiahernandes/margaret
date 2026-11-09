@@ -145,6 +145,4 @@ module.exports = {
   filterSkillBodyForMode,
   getFallbackInstructions,
   getMargaretInstructions,
-  INDEPENDENT_MODES,
-  REVIEW_INSTRUCTIONS,
 };

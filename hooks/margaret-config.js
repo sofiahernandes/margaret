@@ -29,12 +29,8 @@ function normalizeMode(mode) {
   return normalizeAgainst(mode, RUNTIME_MODES);
 }
 
-function normalizeConfigMode(mode) {
-  return normalizeAgainst(mode, VALID_MODES);
-}
-
 function normalizePersistedMode(mode) {
-  return normalizeMode(mode) || normalizeConfigMode(mode);
+  return normalizeMode(mode) || normalizeAgainst(mode, VALID_MODES);
 }
 
 // "stop margaret" / "normal mode" turn margaret off, but only as a standalone
@@ -127,7 +123,6 @@ module.exports = {
   getConfigPath,
   getClaudeDir,
   normalizeMode,
-  normalizeConfigMode,
   normalizePersistedMode,
   isDeactivationCommand,
   writeDefaultMode,

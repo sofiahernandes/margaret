@@ -11,11 +11,10 @@
 // "^general$" is exact. Unset means inject into every subagent, as before.
 
 const { getMargaretInstructions } = require("./margaret-instructions");
-const { readMode, writeHookOutput } = require("./margaret-runtime");
+const { readMode, readStdin, writeHookOutput } = require("./margaret-runtime");
 
 const mode = readMode();
 
-// Absent flag or off → margaret isn't active; inject nothing.
 if (!mode || mode === "off") {
   process.exit(0);
 }
@@ -28,7 +27,6 @@ function inject() {
   }
 }
 
-// A bad regex must never crash the hook; treat it as "no matcher" and inject.
 let matcherRe = null;
 try {
   if (process.env.MARGARET_SUBAGENT_MATCHER) {
@@ -38,30 +36,16 @@ try {
   matcherRe = null;
 }
 
-// No matcher → keep the original synchronous, stdin-independent path. On
-// Windows the PowerShell `if {}` wrapper can swallow piped JSON so stdin
-// 'end' never fires; the default path must not wait on stdin or it would
-// stall every subagent spawn.
 if (!matcherRe) {
   inject();
   process.exit(0);
 }
 
-// Matcher set → read agent_type from stdin and skip only on a definite
-// mismatch. Missing/unparseable agent_type, a stdin error, or the timeout all
-// fail open (inject), so scoping never silently drops the persona.
-let input = "";
-let done = false;
-
-function finish() {
-  if (done) return;
-  done = true;
-
+readStdin((input) => {
   let agentType = "";
   try {
-    // Strip UTF-8 BOM some shells prepend when piping (breaks JSON.parse)
     agentType = String(
-      JSON.parse(input.replace(/^\uFEFF/, "")).agent_type || "",
+      JSON.parse(input.replace(/^﻿/, "")).agent_type || "",
     ).trim();
   } catch (e) {
     // Unparseable payload — fall through and inject to be safe.
@@ -70,18 +54,4 @@ function finish() {
     process.exit(0);
   }
   inject();
-}
-
-process.stdin.on("data", (chunk) => {
-  input += chunk;
 });
-process.stdin.on("end", finish);
-// Never block the session: recover on stdin error or a short fallback.
-process.stdin.on("error", () => {
-  finish();
-  process.exit(0);
-});
-setTimeout(() => {
-  finish();
-  process.exit(0);
-}, 1000).unref();

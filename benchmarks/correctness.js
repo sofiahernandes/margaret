@@ -68,7 +68,14 @@ function tmpFile(ext, content) {
   return p;
 }
 
-// --- Per-task test harnesses ---
+function structuralCheck(blocks, finder, patterns, label) {
+  const code = blocks.find(finder);
+  if (!code) return { pass: false, reason: 'No matching code block found' };
+  const src = code.code;
+  const failures = patterns.filter(([, re]) => !re.test(src)).map(([name]) => name);
+  if (failures.length === 0) return { pass: true, reason: label + ' has required structure' };
+  return { pass: false, reason: 'Missing: ' + failures.join(', ') };
+}
 
 const CHECKS = {
   email(blocks) {
@@ -225,41 +232,28 @@ else:
   },
 
   countdown(blocks) {
-    // React components can't run in bare Node without a bundler. Structural check:
-    // the code must contain timer/countdown logic (useState/useEffect/setInterval/setTimeout).
-    const code = blocks.find((b) => b.code.includes('ount') || b.code.includes('timer') || b.code.includes('Timer'));
-    if (!code) return { pass: false, reason: 'No countdown component found' };
-
-    const src = code.code;
-    const hasState = /useState|useReducer|this\.state/.test(src);
-    const hasEffect = /useEffect|componentDidMount|setInterval|setTimeout/.test(src);
-    const hasDecrement = /- 1|-= 1|prev - 1|count - 1|seconds - 1|time - 1/.test(src);
-
-    const failures = [];
-    if (!hasState) failures.push('no state management (useState/useReducer)');
-    if (!hasEffect) failures.push('no timer setup (useEffect/setInterval/setTimeout)');
-    if (!hasDecrement) failures.push('no countdown decrement logic');
-
-    if (failures.length === 0) return { pass: true, reason: 'Countdown has required structure' };
-    return { pass: false, reason: 'Missing: ' + failures.join(', ') };
+    return structuralCheck(
+      blocks,
+      (b) => b.code.includes('ount') || b.code.includes('timer') || b.code.includes('Timer'),
+      [
+        ['state management (useState/useReducer)', /useState|useReducer|this\.state/],
+        ['timer setup (useEffect/setInterval/setTimeout)', /useEffect|componentDidMount|setInterval|setTimeout/],
+        ['countdown decrement logic', /- 1|-= 1|prev - 1|count - 1|seconds - 1|time - 1/],
+      ],
+      'Countdown',
+    );
   },
 
   ratelimit(blocks) {
-    const code = blocks.find((b) => b.lang === 'python' || b.lang === 'py' || (!b.lang && (b.code.includes('rate') || b.code.includes('limit'))));
-    if (!code) return { pass: false, reason: 'No Python code block found' };
-
-    // Structural check for rate limiting: must have some form of counter/time tracking.
-    const src = code.code;
-    const hasTimeTracking = /time\.|datetime|asyncio/.test(src);
-    const hasLimitLogic = /limit|max_requests|rate|429|Too Many|HTTPException|RateLimiter/.test(src);
-    const hasFastAPI = /fastapi|FastAPI|app\s*=|@app\./.test(src);
-
-    const failures = [];
-    if (!hasLimitLogic) failures.push('no rate limit logic');
-    if (!hasFastAPI) failures.push('no FastAPI usage');
-
-    if (failures.length === 0) return { pass: true, reason: 'Rate limiter has required structure' };
-    return { pass: false, reason: 'Missing: ' + failures.join(', ') };
+    return structuralCheck(
+      blocks,
+      (b) => b.lang === 'python' || b.lang === 'py' || (!b.lang && (b.code.includes('rate') || b.code.includes('limit'))),
+      [
+        ['rate limit logic', /limit|max_requests|rate|429|Too Many|HTTPException|RateLimiter/],
+        ['FastAPI usage', /fastapi|FastAPI|app\s*=|@app\./],
+      ],
+      'Rate limiter',
+    );
   },
 };
 
