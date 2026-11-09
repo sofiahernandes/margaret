@@ -54,29 +54,63 @@ const INVARIANTS = [
   "without its check is unfinished", // one-check promoted to headline
 ];
 
+// margaret-instructions.js builds its strings by concatenation, so an
+// invariant can straddle a `" +` seam and read as missing when it isn't.
+// Collapse the seams before matching.
+const dejoin = (text) => text.replace(/"\s*\+\s*\r?\n\s*"/g, "");
+
+const instructions = dejoin(read("hooks/margaret-instructions.js"));
+
 const sources = [
   ["skills/margaret/SKILL.md", read("skills/margaret/SKILL.md")],
-  ["hooks/margaret-instructions.js", read("hooks/margaret-instructions.js")],
+  ["hooks/margaret-instructions.js", instructions],
   ["AGENTS.md", agents],
 ];
 
+// The scan standard has its own JS copy: REVIEW_INSTRUCTIONS, injected by the
+// hook when review mode is on. The command prompts delegate to the skill, but
+// a runtime-injected string can't, so this is the one copy that stays — pinned
+// here instead. The tag vocabulary already drifted once (the command prompt
+// shipped delete/stdlib/native/yagni/shrink against the skill's five) and
+// nothing caught it.
+const SCAN_INVARIANTS = [
+  "`cut:`",
+  "`builtin:`",
+  "`platform:`",
+  "`overbuilt:`",
+  "`condense:`",
+  "net: -",
+  "Already lean. Ship it.",
+];
+
+const scanSources = [
+  ["skills/margaret-scan/SKILL.md", read("skills/margaret-scan/SKILL.md")],
+  ["hooks/margaret-instructions.js", instructions],
+];
+
 let failed = copiesFailed;
-for (const phrase of INVARIANTS) {
-  for (const [label, text] of sources) {
-    if (!text.includes(phrase)) {
-      console.error(`${label} is missing rule invariant: "${phrase}"`);
-      failed = true;
+
+function pin(phrases, where, label) {
+  for (const phrase of phrases) {
+    for (const [name, text] of where) {
+      if (!text.includes(phrase)) {
+        console.error(`${name} is missing ${label}: "${phrase}"`);
+        failed = true;
+      }
     }
   }
 }
 
+pin(INVARIANTS, sources, "rule invariant");
+pin(SCAN_INVARIANTS, scanSources, "scan invariant");
+
 if (failed) {
   console.error(
-    "Update SKILL.md, AGENTS.md, the getFallbackInstructions() copy in margaret-instructions.js, or the .cursor/.windsurf/.clinerules copies so they all carry the same load-bearing rules.",
+    "Update SKILL.md, AGENTS.md, the getFallbackInstructions()/REVIEW_INSTRUCTIONS copies in margaret-instructions.js, or the .cursor/.windsurf/.clinerules copies so they all carry the same load-bearing rules.",
   );
   process.exit(1);
 }
 
 console.log(
-  `Rule copies in sync: ${copies.length} static copies match AGENTS.md; ${INVARIANTS.length} invariants present in SKILL.md, the JS fallback, and AGENTS.md.`,
+  `Rule copies in sync: ${copies.length} static copies match AGENTS.md; ${INVARIANTS.length} rule invariants present in SKILL.md, the JS fallback, and AGENTS.md; ${SCAN_INVARIANTS.length} scan invariants present in margaret-scan's SKILL.md and REVIEW_INSTRUCTIONS.`,
 );

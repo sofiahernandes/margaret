@@ -11,8 +11,10 @@ const {
 
 const SKILL_PATH = path.join(__dirname, "..", "skills", "margaret", "SKILL.md");
 
-// review is a hidden session mode, not a skill file: /margaret-review (or
-// natural-language "review mode") switches the persona to this for the rest
+// review is a hidden session mode, not a skill file: /margaret-review is the
+// only way in — there is no phrase detection and no skill description to
+// trigger on, and `/margaret review` is not a valid form (the tracker only
+// accepts lean/full/max/off as args). It switches the persona for the rest
 // of the session, same as /margaret lean|full|max, so it holds across turns
 // and propagates into subagents via margaret-subagent.js. Kept out of
 // skills/ on purpose — margaret-scan already owns the user-facing

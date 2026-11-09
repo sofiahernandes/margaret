@@ -5,7 +5,7 @@ description: What margaret is and why it exists
 
 # Margaret
 
-Senior-engineer productivity toolkit for AI coding agents: a lean-code persona, an over-engineering scanner, a security reviewer, and a Figma design/code bridge.
+Senior-engineer productivity toolkit for AI coding agents: a lean-code persona, an over-engineering scanner, a security reviewer, a check runner, a doc keeper, and a Figma design/code bridge — usable one at a time, or chained into a per-change workflow.
 
 ### Why "Margaret"
 
@@ -17,6 +17,18 @@ Named for [Margaret Hamilton](https://science-nasa-gov.translate.goog/people/mar
 2. **Over-engineering scanner** (`/margaret-scan`): inspects the current diff or the whole repo.
 3. **Security reviewer** (`/margaret-guard`): flags only high-confidence, exploitable findings in a diff.
 4. **Figma bridge** (`/margaret-design`): can pull design into a starting point for code, or generate new designs or diagrams for engineers to express themselves visually.
+5. **Check runner** (`margaret-preflight`): runs the repo's own typecheck, linter, and tests, and reports what broke in the fewest lines that identify the cause.
+6. **Doc keeper** (`margaret-docs`): realigns the changelog, context files, and docs with the change that just landed — scoped to what that change actually invalidated.
+
+### The workflow
+
+Two commands, matched to how often the work happens.
+
+`/margaret-init` runs **once per repo**: detects the stack and writes margaret's project context in two tiers — a block of five lines or fewer fenced into `AGENTS.md` (always in context) and the detail in `.margaret/` (loaded on demand). It reports missing checks and is the only command that proposes repo-config fixes. See [Configuration](/docs/configuration#project-context).
+
+`/margaret-ship` runs **once per change**: `margaret-preflight` → `margaret-scan` → `margaret-guard` → `margaret-docs`, against the same change set, stopping at the first failure so you fix it before paying for findings about code that's about to move. Interactive by design — CI should run the deterministic half (`npm run typecheck`, `npm run lint`, `npm test`) directly, with no agent and no tokens.
+
+`/margaret-design` stays outside the loop: it runs once per feature and hands the diff back for manual refinement.
 
 ### How it decides what to build
 

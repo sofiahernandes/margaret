@@ -13,6 +13,8 @@ description: Testing, structure checks, and contributing
 | `.claude-plugin/`, `.codex-plugin/` | Host-specific plugin manifests |
 | `.cursor/`, `.windsurf/`, `.clinerules/` | Static rules-file copies for hosts with no hook system |
 | `AGENTS.md` | Always-on context file for Gemini CLI and generic agent hosts |
+| `scripts/` | Structure and rule-copy drift checks, the `.margaret/stack.md` freshness check, the uninstaller |
+| `evals/` | Pass/fail rubrics and mock tasks, one folder per graded surface |
 | `benchmarks/` | Response-quality benchmarks comparing margaret against baseline/caveman arms |
 | `tests/` | Unit tests for hook logic (config, instructions, mode tracker, runtime, statusline, uninstall) and the stack-hash freshness check |
 
@@ -24,9 +26,26 @@ npm test
 
 This runs the unit test suite, checks that every command/skill declared in `plugin.yaml` is backed by a real file (`scripts/check-structure.js`), and checks that the persona's static copies (`AGENTS.md`, `.cursor/`, `.windsurf/`, `.clinerules/`) haven't drifted from each other (`scripts/check-rule-copies.js`).
 
-## Keeping persona copies in sync
+## Keeping copies in sync
 
-The screen text is duplicated across `AGENTS.md`, `.cursor/rules/margaret.mdc`, `.windsurf/rules/margaret.md`, and `.clinerules/margaret.md` for hosts without a hook system. Edit `skills/margaret/SKILL.md` first, then propagate the change to each static copy — `npm test` fails the build if they drift.
+Two standards exist in more than one place, for two different reasons. `scripts/check-rule-copies.js` pins both.
+
+**The persona screen** is duplicated across `AGENTS.md`, `.cursor/rules/margaret.mdc`, `.windsurf/rules/margaret.md`, and `.clinerules/margaret.md`, for hosts with no hook system, plus a hand-written fallback in `margaret-instructions.js`. Edit `skills/margaret/SKILL.md` first, then propagate to each static copy. The static copies must byte-match `AGENTS.md`; the JS fallback only has to carry the nine pinned rule invariants.
+
+**The scan standard** lives in `skills/margaret-scan/SKILL.md` and again in `REVIEW_INSTRUCTIONS` inside `margaret-instructions.js`, which the hook injects when review mode is active. A runtime-injected string can't delegate to a skill, so that copy stays — the seven scan invariants (the five tags, the net line, the nothing-to-cut line) are pinned instead. This vocabulary has drifted before: `commands/margaret-scan.toml` once shipped `delete`/`stdlib`/`native`/`yagni`/`shrink` against the skill's `cut`/`builtin`/`platform`/`overbuilt`/`condense`, and nothing caught it.
+
+Everywhere else, the rule is **the skill owns the standard, the command owns the procedure** — `commands/*.toml` delegate rather than restate, so there's one source to edit.
+
+## Adding a command or skill
+
+`plugin.yaml` is the manifest, and `npm test` fails if it disagrees with what's on disk:
+
+- A command needs `commands/<name>.toml` or `commands/<name>.md`, listed under `provides_commands`. A `.toml` must have both `description` and `prompt`.
+- A skill needs `skills/<name>/SKILL.md` with `name:` matching the directory and a `description:`, listed under `provides_skills`.
+- Neither implies the other. `margaret-preflight` and `margaret-docs` are skills with no command; `margaret-init`, `margaret-ship`, `margaret-review`, and `margaret-help` are commands with no skill.
+- A new skill is expected to bring `evals/<name>/tasks.json` and `evals/<name>/RUBRIC.md` alongside it.
+
+Where a command and a skill cover the same ground, the **skill owns the standard and the command owns the procedure** — `margaret-guard` is the worked example: the skill defines what counts as a finding, the command gathers git context and fans out the false-positive pass, loading the skill rather than restating it. Two copies of one standard drift on the next edit.
 
 ## Benchmarks
 

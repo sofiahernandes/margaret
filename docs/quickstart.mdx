@@ -45,13 +45,29 @@ Reference-only, not a packaged install: `hooks/copilot-hooks.json` and `hooks/qo
 
 ## First run
 
-Once installed, `/margaret` is active at level `full` from the start of every session (hook-based hosts). Try:
+Once installed, `/margaret` is active at level `full` from the start of every session (hook-based hosts). Nothing else is required — start coding and the persona is already applying the screen. `/margaret-help` prints the full reference card.
+
+## Setting up a repo
+
+Optional, once per repository, re-runnable:
 
 ```
-/margaret-help
+/margaret-init
 ```
 
-for the full reference card, or just start coding — the persona is already applying the screen.
+It detects the stack, shows you a diff, and on approval writes margaret's project context in two tiers — a short fenced block in `AGENTS.md` and the detail in `.margaret/`. It also reports what's missing (no test command, no typecheck script, a CI job calling a runner the repo doesn't have) and offers to fix it.
+
+Skipping it is fine: every command detects what it can and proceeds, stating its assumptions. Init just means they stop re-deriving the basics. See [Configuration](/docs/configuration#project-context) for what the two tiers hold and why they're split.
+
+## Running the loop
+
+Once a change is ready:
+
+```
+/margaret-ship
+```
+
+Checks, over-engineering scan, security pass, docs — in that order, stopping at the first failure. See [Commands & Skills](/docs/commands#margaret-ship).
 
 ## Uninstall
 
@@ -62,3 +78,5 @@ node scripts/uninstall.js
 ```
 
 It only removes the `statusLine` segment it owns, so a statusline combined with another plugin's is left otherwise intact.
+
+Anything `/margaret-init` wrote into a repository is left alone on purpose — `.margaret/` and the fenced `AGENTS.md` block are project files, committed alongside your code, and are yours to keep or remove. To drop them: delete `.margaret/` and the lines between `<!-- margaret:start -->` and `<!-- margaret:end -->`.

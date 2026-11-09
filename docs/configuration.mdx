@@ -35,6 +35,18 @@ Priority order, checked in this sequence:
 
 Use `"off"` to skip auto-activation and start `/margaret` by hand when wanted.
 
+### Writing the config from a session
+
+`/margaret default <mode>` writes the config file for you, so new sessions start there:
+
+```
+/margaret default max
+```
+
+Accepts `lean`, `full`, `max`, `off`. It persists; a plain `/margaret max` is session-scoped and doesn't.
+
+`review` is rejected here on purpose — it's a session-only persona switch and can never become a persisted default. An environment variable still wins over whatever the file says.
+
 ## Status line
 
 Shows the current level (`[MARGARET]`, `[MARGARET:MAX]`). Not wired in automatically — add to `~/.claude/settings.json`:
@@ -62,12 +74,49 @@ Three lifecycle hooks drive the persona in hook-based hosts (`hooks/claude-hooks
 
 Mode resolution logic lives in `hooks/margaret-config.js`, shared by all three hooks.
 
-## Security review config
+## Project context
 
-Optional, both no-op if absent:
+Everything above is user-level and applies everywhere. Per-repository facts live in the repo, committed with the code, written by [`/margaret-init`](/docs/commands#margaret-init).
 
-- `.margaret/security-instructions.md` — extra categories/context appended to `/margaret-guard`'s standard set.
-- `.margaret/security-exclude` — one path glob per line (e.g. `vendor/**`), findings in matching files are dropped.
+Split by how often it's loaded:
+
+| Tier | Where | Loaded | Budget |
+| --- | --- | --- | --- |
+| Constraints | fenced block in `AGENTS.md` | every turn of every session | 5 lines or fewer |
+| Detail | `.margaret/*.md` | only by the command that needs it | free, within reason |
+
+The first tier is in context permanently, so every line is a standing tax on every conversation in that repo — margaret-related or not. Only two kinds of line earn that: a one-line stack summary, and constraints that prevent damage during ordinary work ("never edit `@futurebrand/*`, they're external", "no ISR, the host breaks"). Everything else goes in tier two, where a command pays for it only when it needs it.
+
+Both tiers are fenced with `<!-- margaret:start -->` / `<!-- margaret:end -->`. Re-running init regenerates strictly between the fences, so prose you wrote outside them survives every pass.
+
+### Files
+
+| File | Holds | Written by |
+| --- | --- | --- |
+| `AGENTS.md` (fenced block) | one-line stack, damage-prevention constraints | `/margaret-init` |
+| `.margaret/stack.md` | detected facts, plus a source-hash marker | `/margaret-init`, refreshed by `margaret-docs` |
+| `.margaret/conventions.md` | what detection can't reach — where components live, how they register, token sources, doc format and language | `/margaret-init`, then by hand |
+| `.margaret/security-instructions.md` | extra categories and context added to `/margaret-guard`'s standard set | by hand, optional |
+| `.margaret/security-exclude` | one path glob per line (e.g. `vendor/**`); matching findings are dropped | by hand, optional |
+
+All of them are optional. Missing means no-op — commands detect what they can and proceed, stating their assumptions. They never refuse for want of a config file.
+
+### Freshness
+
+`.margaret/stack.md` ends with a marker recording a short hash of each file its facts came from:
+
+```
+<!-- margaret:sources frontend/package.json=abaf4bf8 backend/package.json=1a2fc4fa -->
+```
+
+```bash
+node scripts/stack-hash.js            # → fresh | stale: <files> | absent | unmarked
+node scripts/stack-hash.js --record   # → the marker line for the detected sources
+```
+
+A script comparing hashes costs about twenty tokens of output. Re-reading those same files into an agent's context costs well over a thousand. That's the whole reason the cache exists — and the check is what keeps it honest when someone changes `package.json` in a pull request margaret never saw.
+
+If a repo documents its conventions already (`CLAUDE.md`, `.ai/AI.md`, a docs tree), init links to it rather than copying it. A duplicated convention is a convention that will disagree with itself.
 
 ## Uninstalling cleanly
 

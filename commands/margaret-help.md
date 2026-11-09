@@ -16,12 +16,12 @@ Full command/skill/hook support: **Claude Code** (`.claude-plugin/`), **Codex** 
 | ------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `/margaret`        | `lean\|full\|max\|off` (full)                              | Senior-engineer persona: requirement check → reuse → stdlib → platform → dependency → one line → minimal build. Holds until changed or session end.                                                                                                                                          |
 | `/margaret-scan`   | `[repo]` (diff)                                            | One-shot over-engineering scan: `L42: overbuilt: factory, one product. Inline.` `repo` widens the scan to the whole tree instead of just the diff.                                                                                                                                           |
-| `/margaret-review` | —                                                          | Switches the session persona to review mode: same complexity-hunt framing as `/margaret-scan`, but holds across turns and propagates into subagents like `/margaret lean\|full\|max` — not a one-shot pass. Hidden mode, not its own skill; revert with `/margaret full` or "stop margaret". |
+| `/margaret-review` | —                                                          | Switches the session persona to review mode: same complexity-hunt framing as `/margaret-scan`, but holds across turns and propagates into subagents like `/margaret lean\|full\|max` — not a one-shot pass. Hidden mode, not its own skill; revert with `/margaret full` or "stop margaret". **`/margaret-review` is the only way in** — `/margaret review` is not a valid form, and there is no natural-language trigger. |
 | `/margaret-guard`  | —                                                          | Security pass on the current diff: exploitable findings only, false positives filtered out.                                                                                                                                                                                                  |
 | `/margaret-design` | `design\|diagram\|code\|context\|connect\|motion` (design) | Figma bridge both ways: generate a new artifact or pull an existing file/selection into code.                                                                                                                                                                                                |
-| `/margaret-help`   | —                                                          | This card.                                                                                                                                                                                                                                                                                   |
 | `/margaret-init`   | —                                                          | Set the repo up for every other command: detect the stack, write the two context tiers (a short fenced block in `AGENTS.md`, detail in `.margaret/`), and report what's missing. Re-runnable — regenerates between the fences and leaves your prose alone. The only command that proposes repo-config fixes. |
 | `/margaret-ship`   | —                                                          | The per-change loop: preflight → scan → guard → docs. Fail-fast — stops at the first failure, offers the fix, re-runs that step, continues. Interactive by design; don't wire it to a hook or to CI.                                                                                         |
+| `/margaret-help`   | —                                                          | This card.                                                                                                                                                                                                                                                                                   |
 
 ## Skills without a command
 
@@ -54,8 +54,16 @@ Out of the box it's `full`, active from the start of every session.
 export MARGARET_DEFAULT_MODE=max
 ```
 
+**Command** — writes the config file for you:
+
+```
+/margaret default max
+```
+
+Accepts `lean`, `full`, `max`, `off`. Not `review`: that one is session-only by design and can never become a persisted default.
+
 **Config file** (`~/.config/margaret/config.json`, on Windows:
-`%APPDATA%\margaret\config.json`):
+`%APPDATA%\margaret\config.json`) — same thing by hand:
 
 ```json
 { "defaultMode": "lean" }

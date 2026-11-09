@@ -1,6 +1,6 @@
 ---
 title: Examples
-description: Sample sessions for each margaret command
+description: Sample sessions for every margaret command and skill
 ---
 
 ## Building with the persona
@@ -26,6 +26,14 @@ net: -41 lines possible.
 ```
 net: -230 lines possible. -3 deps possible.
 ```
+
+## Holding the review persona
+
+**Prompt**: `/margaret-review`
+
+**Response**: `MARGARET MODE CHANGED — level: review`. From there every reply is a scan rather than a build, held across turns and inherited by subagents — unlike `/margaret-scan`, which is one pass and then back to normal.
+
+Only this exact spelling works: `/margaret review` switches you to the configured default instead, and there's no phrase that triggers it. Revert with `/margaret full` or "stop margaret".
 
 ## Auditing security
 
@@ -53,8 +61,62 @@ If nothing clears the >80%-confidence bar, the reply is just: nothing found, sto
 
 **Response**: a structure/tokens/spacing/component-name summary — no code generated, useful before a bigger build to see what's there first.
 
+## Running the repo's checks
+
+**Prompt**: "run the checks" — triggers the `margaret-preflight` skill, also step 1 of `/margaret-ship`
+
+**Response**: verdict first, one line per check, then only the decisive excerpt:
+```
+typecheck  pass  (no script, ran tsc --noEmit directly)
+lint       pass
+test       FAIL  3 of 148
+
+test  src/utils/slug.test.ts:22
+      expected 'a-b', received 'a--b'
+```
+
+Never the full log. A missing check is named once as a gap — `no test command configured` — with no fix proposed, since `/margaret-init` owns that.
+
+## Updating the docs
+
+**Prompt**: "update the docs" after a one-line bugfix — triggers the `margaret-docs` skill, also step 4 of `/margaret-ship`
+
+**Response**: one changelog entry, nothing else.
+> `HISTORY.md` — Slugs no longer collapse double hyphens — "a--b" stayed "a--b" and broke the posts route.
+
+A change that adds a required env var instead gets the changelog entry written and a README diff **proposed**: internal and append-only files are written directly, anything rewritten in place or visible to someone else waits for approval. A docs directory with a site config is treated as published, so it's proposed too.
+
+Nothing drifted? `Docs are current.` and stop.
+
+## Setting up a repo
+
+**Prompt**: `/margaret-init`
+
+**Response**: a detection summary, then the diff it wants to write — a fenced five-line block for `AGENTS.md` and the detail for `.margaret/` — and it waits. Then, only if something is missing:
+```
+no typecheck script, but tsconfig.json exists → add "typecheck": "tsc --noEmit"
+.github/workflows/coverage.yml runs a jest action, but jest isn't installed
+```
+Silent when the repo is already in order.
+
+## Running the whole loop
+
+**Prompt**: `/margaret-ship`
+
+**Response**: four steps in order, stopping at the first failure:
+```
+preflight  FAIL  test — src/utils/slug.test.ts:22 expected 'a-b', received 'a--b'
+```
+It reports, offers the fix, and where the fix is a judgment call it lays out the options and asks rather than picking. Once fixed it re-runs that step and continues into `margaret-scan`, `margaret-guard`, `margaret-docs` — it doesn't restart the sequence. Four clean steps end in a one-line verdict, not a report.
+
 ## Getting the reference card
 
 **Prompt**: `/margaret-help`
 
 **Response**: the command table, intensity levels, and default-mode setup shown in [Commands & Skills](/docs/commands) and [Configuration](/docs/configuration) — a one-shot display, no mode switch.
+
+## Persisting a default level
+
+**Prompt**: `/margaret default max`
+
+**Response**: `MARGARET DEFAULT SET — new sessions start in max.` Written to `~/.config/margaret/config.json`. A plain `/margaret max` only lasts the session; this survives restarts.

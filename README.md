@@ -15,12 +15,37 @@ Named for [Margaret Hamilton](https://science-nasa-gov.translate.goog/people/mar
 
 ### What it is
 
-Margaret is a plugin for developers. It bundles four things senior engineers actually want during a session:
+Margaret is a plugin for developers. It bundles the things senior engineers actually want during a session:
 
 1. An **architect** that designs before it codes and defaults to the smallest correct implementation.
 2. An **over-engineering scanner** that inspects the current diff or the whole repo.
 3. A **security reviewer** that flags only high-confidence, exploitable findings in a diff.
 4. A **Figma bridge** that can pull design into a starting point for code, or generate new designs or diagrams for engineers to express themselves visually.
+5. A **check runner** that runs the repo's own tests, linter, and type checker and reports what broke.
+6. A **doc keeper** that realigns the changelog and docs with the change that just landed.
+
+Use them one at a time, or run `/margaret-ship` to take a change through all of them in order.
+
+<br/>
+
+### The workflow
+
+Two commands, matched to how often the work actually happens.
+
+**Once per repo** — `/margaret-init` detects the stack and writes margaret's project context in two tiers: a block of five lines or fewer fenced into `AGENTS.md` (always in context — the one-line stack plus the constraints that prevent damage during ordinary work), and the detail in `.margaret/`, loaded only by the command that needs it. Re-runnable: it regenerates strictly between its fences, so your own prose survives. If anything is missing — no test command, no typecheck script, a CI job calling a runner the repo doesn't have — it says so and offers the fix. It's the only command that touches repo config.
+
+**Once per change** — `/margaret-ship` runs the loop:
+
+```
+margaret-preflight  → the repo's own typecheck, lint, tests
+margaret-scan       → over-engineering in the diff
+margaret-guard      → exploitable security findings in the diff
+margaret-docs       → changelog, context files, docs
+```
+
+It stops at the first failure, offers the fix, re-runs that step, then carries on — findings about code that's about to change are findings you pay for twice. It expects a person, so don't wire it to a git hook or CI; CI should run `npm run typecheck`, `npm run lint`, and `npm test` directly, which costs no tokens and needs no agent.
+
+Design work sits outside the loop on purpose: `/margaret-design code` is once per feature and hands the diff back for you to refine, so it isn't a step in a per-change sequence.
 
 <br/>
 
@@ -98,13 +123,14 @@ function getDateVariants(date: string): string[] {
 | `/margaret-design` | `design\|diagram\|code\|context\|connect\|motion` (design) | Figma bridge both ways: generate a new artifact, or pull an existing file/selection into code. |
 | `/margaret-guard`  | —                                                          | Security review of the current diff: high-confidence, exploitable findings only.               |
 | `/margaret-scan`   | `[repo]` (diff)                                            | Over-engineering scan: one line per finding, `repo` scans the whole tree instead of the diff.  |
+| `/margaret-review` | —                                                          | Hidden session mode: the complexity hunt held across turns instead of one pass. `/margaret-review` is the only spelling that works. |
 | `/margaret-init`   | —                                                          | Set the repo up for the rest: detect the stack, write the context tiers, report what's missing. |
 | `/margaret-ship`   | —                                                          | Per-change loop: checks, over-engineering scan, security pass, docs. Stops at the first failure. |
 | `/margaret-help`   | —                                                          | Reference card for all of the above.                                                           |
 
 Two skills trigger from natural language with no command of their own: **`margaret-preflight`** runs the repo's own checks ("run the tests", "typecheck") and **`margaret-docs`** realigns changelog and docs with a change that just landed ("update the docs"). Both are steps of `/margaret-ship`.
 
-Set the level for every new session with `MARGARET_DEFAULT_MODE` (`lean`/`full`/`max`/`off`), or a `defaultMode` field in `~/.config/margaret/config.json` (`%APPDATA%\margaret\config.json` on Windows). Default is `full`.
+Switch the level for the current session with `/margaret lean|full|max|off`. Set the level for **every new session** with `/margaret default <mode>`, which writes it to `~/.config/margaret/config.json` (`%APPDATA%\margaret\config.json` on Windows) — or set `MARGARET_DEFAULT_MODE`, which takes priority over the file. Default is `full`.
 
 <br/>
 

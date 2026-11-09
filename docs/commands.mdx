@@ -7,7 +7,7 @@ Most commands have a matching skill, so the same behavior triggers on natural la
 
 | Command | Args (default) | What it does |
 | --- | --- | --- |
-| `/margaret` | `lean\|full\|max\|off` (full) | Design first, implement smallest. Sticks until changed or session end. |
+| `/margaret` | `lean\|full\|max\|off` (full) | Design first, implement smallest. Sticks until changed or session end. Bare form reports the active level; `/margaret default <mode>` persists it. |
 | `/margaret-scan` | `[repo]` (diff) | Over-engineering scan: one line per finding, `repo` scans the whole tree instead of the diff. |
 | `/margaret-review` | — | Switches the session persona to review mode: same complexity-hunt framing as `/margaret-scan`, but holds across turns. Hidden mode, not its own skill. |
 | `/margaret-guard` | — | Security review of the current diff: high-confidence, exploitable findings only. |
@@ -28,6 +28,8 @@ Skills with no command of their own:
 Skill: `skills/margaret`. Triggers on the slash command, or on phrases like "margaret", "be lean", "lean mode", "simplest solution", "yagni", "do less", "shortest path", or mentions of over-engineering/bloat/boilerplate/unnecessary dependencies.
 
 Runs the 7-filter screen described in [Overview](/) before writing code. Three intensity levels — see [Configuration](/docs/configuration#intensity-levels).
+
+`/margaret <mode>` switches the level for this session; `/margaret default <mode>` persists it to `~/.config/margaret/config.json` so new sessions start there. Both accept `lean`, `full`, `max`, `off` — nothing else. Bare `/margaret` reports the active level without changing it.
 
 ## Margaret Scan
 
@@ -52,7 +54,9 @@ Ends with `net: -<N> lines possible.` (repo scope also reports `-<M> deps possib
 
 ## Margaret Review
 
-Not a skill of its own — a session-level persona switch like `/margaret lean|full|max`. Once active, every reply is a complexity scan, never a rewrite. Revert with `/margaret full` or "stop margaret".
+Not a skill of its own — a session-level persona switch like `/margaret lean|full|max`. Once active, every reply is a complexity scan, never a rewrite, and the framing propagates into subagents. Revert with `/margaret full` or "stop margaret".
+
+**`/margaret-review` is the only way in.** There's no natural-language trigger and no skill description to match on, and `/margaret review` is *not* a valid form — the arg parser accepts only `lean`, `full`, `max`, and `off`, so that spelling falls through to the configured default instead. It's hook-based hosts only (Claude Code, Codex); on Gemini CLI, Cursor, Windsurf, and Cline there's no mode switching at all. Being hard to stumble into is the point — it's a hidden mode.
 
 ## Margaret Guard
 
